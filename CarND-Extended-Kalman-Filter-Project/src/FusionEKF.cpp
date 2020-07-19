@@ -71,7 +71,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 		0, 0, 0, 1000;
 
 	// Update timestamp:
-	ekf_.previous_timestamp_ = MeasurementPackage.timestamp_;
+	previous_timestamp_ = measurement_pack.timestamp_;
 
 	// Initialize states using the first measurement:
     if (measurement_pack.sensor_type_ == MeasurementPackage::RADAR) {
@@ -114,7 +114,10 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
    * Use noise_ax = 9 and noise_ay = 9 for your Q matrix.
    */
   // Calculate time difference:
-  double dt = (MeasurementPackage.timestamp_ - ekf_.previous_timestamp_) / 1000000.0; // [s]
+  double dt = (measurement_pack.timestamp_ - previous_timestamp_) / 1000000.0; // [s]
+  double dt_2 = dt * dt;
+  double dt_3 = dt_2 * dt;
+  double dt_4 = dt_3 * dt;
 	// State prediction eqn: x_{k+1} = F * x_{k} + G * a_k.
 	// G * a_{k} has mean 0 and cov Q
   ekf_.F_ << 1, 0, dt, 0,
