@@ -40,7 +40,10 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 		VectorXd error_i = estimations[i] - ground_truth[i];
 		squared_error = squared_error + error_i.array().square();
 	}
+
 	std::cout << "Squared error is : " << squared_error << std::endl;
+	std::cout << "Last estimation is: " << estimations[estimations.size()-1] << std::endl;
+	std::cout << "Last ground_truth is: " << ground_truth[estimations.size() - 1] << std::endl;
 
 	// calculate the mean and squared root
 	ArrayXd mean_squared_error = squared_error / estimations.size();
