@@ -46,6 +46,12 @@ class KalmanFilter {
    */
   void UpdateEKF(const Eigen::VectorXd &z);
 
+  /**
+   * Updates the state by using Kalman Filter equations
+   * @param y The error at k+1
+   */
+  void UpdateWithError(const Eigen::VectorXd &y);
+
   // state vector
   Eigen::VectorXd x_;
 

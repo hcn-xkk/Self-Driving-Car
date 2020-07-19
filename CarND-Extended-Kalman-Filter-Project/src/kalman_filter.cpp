@@ -43,19 +43,22 @@ void KalmanFilter::Update(const VectorXd &z) {
   /**
    * TODO: update the state by using Kalman Filter equations
    */
-
+   // Calculate error y
 	VectorXd z_pred = H_ * x_;
 	VectorXd y = z - z_pred;
-	MatrixXd Ht = H_.transpose();
-	MatrixXd S = H_ * P_ * Ht + R_;
-	MatrixXd Si = S.inverse();
-	MatrixXd PHt = P_ * Ht;
-	MatrixXd K = PHt * Si;
-	//new estimate
-	x_ = x_ + (K * y);
-	long x_size = x_.size();
-	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	P_ = (I - K * H_) * P_;
+	
+	//// Measurement update step in Kalman Filter
+	//MatrixXd Ht = H_.transpose();
+	//MatrixXd S = H_ * P_ * Ht + R_;
+	//MatrixXd Si = S.inverse();
+	//MatrixXd PHt = P_ * Ht;
+	//MatrixXd K = PHt * Si;
+	////new estimate
+	//x_ = x_ + (K * y);
+	//long x_size = x_.size();
+	//MatrixXd I = MatrixXd::Identity(x_size, x_size);
+	//P_ = (I - K * H_) * P_;
+	UpdateWithError(y);
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
@@ -73,9 +76,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 	z_pred[0] = rho;
 	z_pred[1] = atan2(py, px); // atan2 returns value in -pi, pi
 	z_pred[2] = (px * vx + py * vy) / rho;
-	std::cout << "Debug: estimated z_pred " << z_pred << std::endl;
+	
+	// Calculate error y
 	VectorXd y = z - z_pred;
-	std::cout << "Debug: estimated y " << y << std::endl;
+	// y[1] is angle, make sure angle is within [-pi,pi]
 	while (y(1) > M_PI || y(1) < -M_PI) {
 		if (y(1) > M_PI) {
 			y(1) -= M_PI;
@@ -84,11 +88,31 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 			y(1) += M_PI;
 		}
 	}
+	
+	//// Measurement update step in Kalman Filter
+	//MatrixXd Ht = H_.transpose();
+	//MatrixXd S = H_ * P_ * Ht + R_;
+	//MatrixXd Si = S.inverse();
+	//MatrixXd PHt = P_ * Ht;
+	//MatrixXd K = PHt * Si;
+
+	////new estimate
+	//x_ = x_ + (K * y);
+	//long x_size = x_.size();
+	//MatrixXd I = MatrixXd::Identity(x_size, x_size);
+	//P_ = (I - K * H_) * P_;
+	UpdateWithError(y);
+}
+
+void KalmanFilter::UpdateWithError(const VectorXd &y) {
+
+	// Measurement update step in Kalman Filter
 	MatrixXd Ht = H_.transpose();
 	MatrixXd S = H_ * P_ * Ht + R_;
 	MatrixXd Si = S.inverse();
 	MatrixXd PHt = P_ * Ht;
 	MatrixXd K = PHt * Si;
+
 	//new estimate
 	x_ = x_ + (K * y);
 	long x_size = x_.size();
