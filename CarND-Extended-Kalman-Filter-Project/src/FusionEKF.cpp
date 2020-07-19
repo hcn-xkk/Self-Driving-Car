@@ -36,7 +36,11 @@ FusionEKF::FusionEKF() {
    * TODO: Finish initializing the FusionEKF.
    * TODO: Set the process and measurement noises
    */
-
+  ekf_.P_ = MatrixXd(4, 4);
+  ekf_.P_ << 1, 0, 0, 0,
+	  0, 1, 0, 0,
+	  0, 0, 1000, 0,
+	  0, 0, 0, 1000;
   H_laser_ << 1, 0, 0, 0,
 	  0, 1, 0, 0;
   // Hj_ will depend on state, so change value when used. 
@@ -64,11 +68,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
-	ekf_.P_ = MatrixXd(4, 4); 
-	ekf_.P_ << 1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 1000, 0,
-		0, 0, 0, 1000;
+	// ekf_.F_ = MatrixXd(4, 4);
+	// ekf_.Q_ = MatrixXd(4, 4);
 
 	// Update timestamp:
 	previous_timestamp_ = measurement_pack.timestamp_;
@@ -92,10 +93,13 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
       // TODO: Initialize state.
 		ekf_.x_[0] = measurement_pack.raw_measurements_[0];
 		ekf_.x_[1] = measurement_pack.raw_measurements_[1];
+		ekf_.x_[2] = 0;
+		ekf_.x_[3] = 0;
     }
 
     // done initializing, no need to predict or update
     is_initialized_ = true;
+	std::cout << "Debug: Initialized in FusionEKF done." << std::endl;
     return;
   }
 
@@ -118,21 +122,25 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   double dt_2 = dt * dt;
   double dt_3 = dt_2 * dt;
   double dt_4 = dt_3 * dt;
+  std::cout << "Debug: previous_timestamp_ is " << previous_timestamp_ << std::endl;
+  std::cout << "Debug: measurement_pack.timestamp_ is " << measurement_pack.timestamp_ << std::endl;
+  previous_timestamp_ = measurement_pack.timestamp_;
 	// State prediction eqn: x_{k+1} = F * x_{k} + G * a_k.
 	// G * a_{k} has mean 0 and cov Q
   ekf_.F_ << 1, 0, dt, 0,
 	  0, 1, 0, dt,
 	  0, 0, 1, 0,
 	  0, 0, 0, 1;
-  double noise_ax = 9;
-  double noise_ay = 9;
+  std::cout << "Debug: F_ in FusionEKF done." << ekf_.F_ << std::endl;
+  double noise_ax = 9.0;
+  double noise_ay = 9.0;
   ekf_.Q_ << dt_4 / 4.0*noise_ax, 0, dt_3 / 2.0*noise_ax, 0,
 	  0, dt_4 / 4.0*noise_ay, 0, dt_3 / 2.0*noise_ay,
 	  dt_3 / 2.0*noise_ax, 0, dt_2*noise_ax, 0,
 	  0, dt_3 / 2.0*noise_ay, 0, dt_2*noise_ay;
-
+  std::cout << "Debug: Q_ in FusionEKF done." << ekf_.Q_ << std::endl;
   ekf_.Predict();
-
+  std::cout << "Debug: Predict in FusionEKF done." << std::endl;
   /**
    * Update
    */
@@ -149,14 +157,14 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 	  ekf_.H_ = Hj_;
 	  ekf_.R_ = R_radar_;
 	  ekf_.UpdateEKF(measurement_pack.raw_measurements_);
-
+	  std::cout << "Debug: UpdateEKF in FusionEKF done." << std::endl;
   } else {
     // TODO: Laser updates
 	// Use 
 	ekf_.H_ = H_laser_;
 	ekf_.R_ = R_laser_;
 	ekf_.Update(measurement_pack.raw_measurements_);
-
+	std::cout << "Debug: Update in FusionEKF done." << std::endl;
   }
 
   // print the output

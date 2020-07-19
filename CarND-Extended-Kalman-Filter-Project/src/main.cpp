@@ -139,7 +139,7 @@ int main() {
           auto msg = "42[\"estimate_marker\"," + msgJson.dump() + "]";
           std::cout << msg << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-
+		  std::cout << "Debug: ws.send in main.cpp done." << std::endl;
         }  // end "telemetry" if
 
       } else {
