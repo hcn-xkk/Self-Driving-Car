@@ -69,7 +69,9 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 		0, 1, 0, 0,
 		0, 0, 1000, 0,
 		0, 0, 0, 1000;
-	ekf_.Init(x_in, P_in, MatrixXd(4, 4),H_laser_, R_laser_, MatrixXd(4, 4));
+	MatrixXd F_in = MatrixXd(4, 4);
+	MatrixXd Q_in = MatrixXd(4, 4);
+	ekf_.Init(x_in, P_in, F_in, H_laser_, R_laser_, Q_in);
 
 	// Update timestamp:
 	previous_timestamp_ = measurement_pack.timestamp_;
