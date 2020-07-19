@@ -68,8 +68,8 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
     cout << "EKF: " << endl;
     ekf_.x_ = VectorXd(4);
     ekf_.x_ << 1, 1, 1, 1;
-	// ekf_.F_ = MatrixXd(4, 4);
-	// ekf_.Q_ = MatrixXd(4, 4);
+	ekf_.F_ = MatrixXd(4, 4);
+	ekf_.Q_ = MatrixXd(4, 4);
 
 	// Update timestamp:
 	previous_timestamp_ = measurement_pack.timestamp_;
@@ -127,6 +127,7 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
   previous_timestamp_ = measurement_pack.timestamp_;
 	// State prediction eqn: x_{k+1} = F * x_{k} + G * a_k.
 	// G * a_{k} has mean 0 and cov Q
+
   ekf_.F_ << 1, 0, dt, 0,
 	  0, 1, 0, dt,
 	  0, 0, 1, 0,
