@@ -39,31 +39,23 @@ void KalmanFilter::Predict() {
 
 }
 
-void KalmanFilter::Update(const VectorXd &z) {
+void KalmanFilter::PrepareErrorForKFUpdate(const VectorXd &z) {
   /**
-   * TODO: update the state by using Kalman Filter equations
+   * Generate error vector y using ladar measurement
+   * for updating step in Kalman Filter equations
    */
    // Calculate error y
 	VectorXd z_pred = H_ * x_;
 	VectorXd y = z - z_pred;
 	
-	//// Measurement update step in Kalman Filter
-	//MatrixXd Ht = H_.transpose();
-	//MatrixXd S = H_ * P_ * Ht + R_;
-	//MatrixXd Si = S.inverse();
-	//MatrixXd PHt = P_ * Ht;
-	//MatrixXd K = PHt * Si;
-	////new estimate
-	//x_ = x_ + (K * y);
-	//long x_size = x_.size();
-	//MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	//P_ = (I - K * H_) * P_;
+	// Measurement update step in Kalman Filter
 	UpdateWithError(y);
 }
 
-void KalmanFilter::UpdateEKF(const VectorXd &z) {
+void KalmanFilter::PrepareErrorForEKFUpdate(const VectorXd &z) {
   /**
-   * TODO: update the state by using Extended Kalman Filter equations
+   * Generate error vector y using radar measurement
+   * for updating step in Extended Kalman Filter equations
    * This function requires the radar measurement function z = h(x)
    */
 	// z_pred using h(x)
@@ -89,22 +81,11 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 		}
 	}
 	
-	//// Measurement update step in Kalman Filter
-	//MatrixXd Ht = H_.transpose();
-	//MatrixXd S = H_ * P_ * Ht + R_;
-	//MatrixXd Si = S.inverse();
-	//MatrixXd PHt = P_ * Ht;
-	//MatrixXd K = PHt * Si;
-
-	////new estimate
-	//x_ = x_ + (K * y);
-	//long x_size = x_.size();
-	//MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	//P_ = (I - K * H_) * P_;
+	// Measurement update step in Kalman Filter
 	UpdateWithError(y);
 }
 
-void KalmanFilter::UpdateWithError(const VectorXd &y) {
+void KalmanFilter::UpdateKFWithError(const VectorXd &y) {
 
 	// Measurement update step in Kalman Filter
 	MatrixXd Ht = H_.transpose();
