@@ -6,6 +6,7 @@ using Eigen::ArrayXd;
 using Eigen::MatrixXd;
 using std::vector;
 
+
 Tools::Tools() {}
 
 Tools::~Tools() {}
@@ -24,11 +25,11 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 	int n_estimation = estimations.size();
 	int n_truth = ground_truth.size();
 	if (n_estimation == 0) {
-		cout << "Length of estimation is 0." << endl;
+		std::cout << "Length of estimation is 0." << std::endl;
 		return rmse;
 	}
 	if (n_truth != n_estimation) {
-		cout << "Length of estimation is not equal to ground truth." << endl;
+		std::cout << "Length of estimation is not equal to ground truth." << std::endl;
 		return rmse;
 	}
 
@@ -39,7 +40,7 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 		VectorXd error_i = estimations[i] - ground_truth[i];
 		squared_error = squared_error + error_i.array().square();
 	}
-	cout << "Squared error is : " << squared_error << endl;
+	std::cout << "Squared error is : " << squared_error << std::endl;
 
 	// calculate the mean and squared root
 	ArrayXd mean_squared_error = squared_error / estimations.size();
@@ -63,7 +64,7 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 	// TODO: YOUR CODE HERE 
 	// check division by zero
 	if ((px < 1e-4) && (py < 1e-4)) {
-		cout << "Error - Division by zero" << endl;
+		std::cout << "Error - Division by zero" << std::endl;
 		return Hj;
 	}
 	// compute the Jacobian matrix
