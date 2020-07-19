@@ -62,17 +62,14 @@ void FusionEKF::ProcessMeasurement(const MeasurementPackage &measurement_pack) {
 
     // first measurement and its state cov matrix
     cout << "EKF: " << endl;
-    ekf_.x_ = VectorXd(4);
-    ekf_.x_ << 1, 1, 1, 1;
-	ekf_.F_ = MatrixXd(4, 4);
-	ekf_.Q_ = MatrixXd(4, 4);
-	ekf_.P_ = MatrixXd(4, 4);
-	ekf_.P_ << 1, 0, 0, 0,
+	VectorXd x_in = VectorXd(4);
+	x_in << 1, 1, 1, 1;
+	MatrixXd P_in = MatrixXd(4, 4);
+	P_in << 1, 0, 0, 0,
 		0, 1, 0, 0,
 		0, 0, 1000, 0,
 		0, 0, 0, 1000;
-	ekf_.R_ = R_laser_;
-	ekf_.H_ = H_laser_;
+	ekf_.Init(x_in, P_in, MatrixXd(4, 4),H_laser_, R_laser_, MatrixXd(4, 4));
 
 	// Update timestamp:
 	previous_timestamp_ = measurement_pack.timestamp_;

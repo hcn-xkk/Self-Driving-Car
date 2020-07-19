@@ -21,6 +21,10 @@ void KalmanFilter::Init(VectorXd &x_in, MatrixXd &P_in, MatrixXd &F_in,
   H_ = H_in;
   R_ = R_in;
   Q_ = Q_in;
+  std::cout << "Debug: Init function" << std::endl;
+  std::cout << "H_in: " << H_in << std::endl;
+  std::cout << "x_in: " << x_in << std::endl;
+
 }
 
 void KalmanFilter::Predict() {
