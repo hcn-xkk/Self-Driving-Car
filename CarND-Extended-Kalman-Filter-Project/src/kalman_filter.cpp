@@ -39,7 +39,7 @@ void KalmanFilter::Predict() {
 
 }
 
-void KalmanFilter::PrepareErrorForKFUpdate(const VectorXd &z) {
+void KalmanFilter::Update(const VectorXd &z) {
   /**
    * Generate error vector y using ladar measurement
    * for updating step in Kalman Filter equations
@@ -52,7 +52,7 @@ void KalmanFilter::PrepareErrorForKFUpdate(const VectorXd &z) {
 	UpdateWithError(y);
 }
 
-void KalmanFilter::PrepareErrorForEKFUpdate(const VectorXd &z) {
+void KalmanFilter::UpdateEKF(const VectorXd &z) {
   /**
    * Generate error vector y using radar measurement
    * for updating step in Extended Kalman Filter equations
