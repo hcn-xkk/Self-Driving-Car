@@ -49,7 +49,7 @@ void KalmanFilter::Update(const VectorXd &z) {
 	VectorXd y = z - z_pred;
 	
 	// Measurement update step in Kalman Filter
-	UpdateWithError(y);
+	UpdateKFWithError(y);
 }
 
 void KalmanFilter::UpdateEKF(const VectorXd &z) {
@@ -82,7 +82,7 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 	}
 	
 	// Measurement update step in Kalman Filter
-	UpdateWithError(y);
+	UpdateKFWithError(y);
 }
 
 void KalmanFilter::UpdateKFWithError(const VectorXd &y) {
