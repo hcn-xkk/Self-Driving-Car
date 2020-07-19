@@ -41,10 +41,6 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 		squared_error = squared_error + error_i.array().square();
 	}
 
-	std::cout << "Squared error is : " << squared_error << std::endl;
-	std::cout << "Last estimation is: " << estimations[estimations.size()-1] << std::endl;
-	std::cout << "Last ground_truth is: " << ground_truth[estimations.size() - 1] << std::endl;
-
 	// calculate the mean and squared root
 	ArrayXd mean_squared_error = squared_error / estimations.size();
 	rmse = mean_squared_error.sqrt().matrix();
@@ -67,9 +63,21 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 
 	// TODO: YOUR CODE HERE 
 	// check division by zero
-	if ((px < 1e-4) && (py < 1e-4)) {
+	if ((abs(px) < 1e-4) && (abs(py) < 1e-4)) {
 		std::cout << "Error - Division by zero" << std::endl;
-		return Hj;
+		//return Hj;
+		if (px > 0) {
+			px = 1e-4;
+		}
+		else {
+			px = -1e-4;
+		}
+		if (py > 0) {
+			py = 1e-4;
+		}
+		else {
+			py = -1e-4;
+		}
 	}
 	// compute the Jacobian matrix
 	float rou_2 = pow(px, 2) + pow(py, 2);
