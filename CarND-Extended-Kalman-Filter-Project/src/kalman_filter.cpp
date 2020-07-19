@@ -68,8 +68,17 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 	z_pred[0] = rho;
 	z_pred[1] = atan2(py, px); // atan2 returns value in -pi, pi
 	z_pred[2] = (px * vx + py * vy) / rho;
-
+	std::cout << "Debug: estimated z_pred " << z_pred << std::endl;
 	VectorXd y = z - z_pred;
+	std::cout << "Debug: estimated y " << y << std::endl;
+	while (y(1) > M_PI || y(1) < -M_PI) {
+		if (y(1) > M_PI) {
+			y(1) -= M_PI;
+		}
+		else {
+			y(1) += M_PI;
+		}
+	}
 	MatrixXd Ht = H_.transpose();
 	MatrixXd S = H_ * P_ * Ht + R_;
 	MatrixXd Si = S.inverse();
