@@ -14,7 +14,7 @@ Tools::~Tools() {}
 VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
                               const vector<VectorXd> &ground_truth) {
   /**
-   * TODO: Calculate the RMSE here.
+   * Calculate the RMSE here for vector of VectorXd.
    */
 	VectorXd rmse(4);
 	rmse << 0, 0, 0, 0;
@@ -50,8 +50,9 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
 
 MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   /**
-   * TODO:
-   * Calculate a Jacobian here.
+   * Calculate Jacobian matrix for radar measurement.
+   * Radar measures [rho, phi, rho_dot]=[range, bearing, range rate]
+   * States are [px, py, vx, vy]
    */
 	
 	MatrixXd Hj(3, 4);
