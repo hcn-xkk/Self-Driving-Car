@@ -62,7 +62,6 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
 	float vx = x_state(2);
 	float vy = x_state(3);
 
-	// TODO: YOUR CODE HERE 
 	// check division by zero
 	if ((abs(px) < 1e-4) && (abs(py) < 1e-4)) {
 		std::cout << "Error - Division by zero" << std::endl;
