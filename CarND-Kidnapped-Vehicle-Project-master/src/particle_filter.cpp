@@ -89,13 +89,28 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 	std::normal_distribution<double> theta_distribution(0.0, std_pos[2]);
 
 	for (int i = 0; i < num_particles; i++) {
-		particles[i].theta += yaw_rate * delta_t + theta_distribution(gen) + 2 * M_PI;
+		/*particles[i].theta += yaw_rate * delta_t + theta_distribution(gen) + 2 * M_PI;
 		while (particles[i].theta >= 2 * M_PI) {
 			particles[i].theta -= 2 * M_PI;
 		}
 		double dist = delta_t * velocity;
 		particles[i].x += dist * cos(particles[i].theta) + x_distribution(gen);
 		particles[i].y += dist * sin(particles[i].theta) + y_distribution(gen);
+	*/
+		// calculate new state
+		if (fabs(yaw_rate) < 0.00001) {
+			particles[i].x += velocity * delta_t * cos(particles[i].theta);
+			particles[i].y += velocity * delta_t * sin(particles[i].theta);
+		}
+		else {
+			particles[i].x += velocity / yaw_rate * (sin(particles[i].theta + yaw_rate * delta_t) - sin(particles[i].theta));
+			particles[i].y += velocity / yaw_rate * (cos(particles[i].theta) - cos(particles[i].theta + yaw_rate * delta_t));
+			particles[i].theta += yaw_rate * delta_t;
+		}
+		// add noise
+		particles[i].x += x_distribution(gen);
+		particles[i].y += y_distribution(gen);
+		particles[i].theta += theta_distribution(gen);
 	}
 	
 }
