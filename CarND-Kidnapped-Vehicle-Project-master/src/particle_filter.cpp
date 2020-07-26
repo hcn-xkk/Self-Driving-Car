@@ -24,42 +24,55 @@ using std::string;
 using std::vector;
 std::default_random_engine gen;
 
-void ParticleFilter::init(double x, double y, double theta, double std[]) {
-  /**
-   * TODO: Set the number of particles. Initialize all particles to 
-   *   first position (based on estimates of x, y, theta and their uncertainties
-   *   from GPS) and all weights to 1. 
-   * TODO: Add random Gaussian noise to each particle.
-   * NOTE: Consult particle_filter.h for more information about this method 
-   *   (and others in this file).
-   */
-  num_particles = 100;  // TODO: Set the number of particles
-  fill(weights.begin(), weights.end(), 1.0/ num_particles);   // initialize to even weights
-  
-  // Create normal distribution for each state:
-  
-  std::normal_distribution<double> pos_x(x, std[0]);
-  std::normal_distribution<double> pos_y(y, std[1]);
-  std::normal_distribution<double> pos_theta(theta, std[2]);
+void ParticleFilter::init(double x, double y, double theta, double std1[]) {
+	/**
+	 * TODO: Set the number of particles. Initialize all particles to
+	 *   first position (based on estimates of x, y, theta and their uncertainties
+	 *   from GPS) and all weights to 1.
+	 * TODO: Add random Gaussian noise to each particle.
+	 * NOTE: Consult particle_filter.h for more information about this method
+	 *   (and others in this file).
+	 */
+	std::cout << "Debug : particle_filter.cpp : Enter pf.init  " << std::endl;
+	num_particles = 10;  // TODO: Set the number of particles
+	// fill(weights.begin(), weights.end(), 1.0/ num_particles);   // initialize to even weights
 
-  // Initialize particles locations by GPS measurements with random noise.
-  for (int i = 0; i < num_particles; i++) {
-	  Particle p;
-	  p.x = pos_x(gen);
-	  p.y = pos_y(gen);
-	  p.theta = pos_theta(gen);
-	  p.weight = weights[i];
-	  particles.push_back(p);
+	// Create normal distribution for each state:
+	std::normal_distribution<double> pos_x(x, std1[0]);
+	std::normal_distribution<double> pos_y(y, std1[1]);
+	std::normal_distribution<double> pos_theta(theta, std1[2]);
 
-	  // The following members remain unchanged. 
-	  /*particles[i].associations;
-	  particles[i].sense_x;
-	  particles[i].sense_y;*/
-  }
+	// Initialize particles locations by GPS measurements with random noise.
+	for (int i = 0; i < num_particles; i++) {
+		Particle p;
+		p.id = i;
+		p.x = pos_x(gen);
+		p.y = pos_y(gen);
+		p.theta = pos_theta(gen);
+		p.weight = 1.0;
+		particles.push_back(p);
+		weights.push_back(1.0);
+
+		// The following members remain unchanged. 
+		/*particles[i].associations;
+		particles[i].sense_x;
+		particles[i].sense_y;*/
+	}
+
+	std::cout << "Debug : particle_filter.cpp : Particle 0 has position "
+		<< particles[0].x << " " << particles[0].y << std::endl;
+
+	// Set state var initilzed.
+	is_initialized = true;
+	std::cout << "Debug : particle_filter.cpp : Exit pf.init  " << std::endl;
+}
+
+  std::cout << "Debug : particle_filter.cpp : Particle 0 has position "
+	  << particles [0].x << " " << particles[0].y << std::endl;
 
   // Set state var initilzed.
   is_initialized = true;
-
+  std::cout << "Debug : particle_filter.cpp : Exit pf.init  " << std::endl;
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], 
@@ -82,7 +95,11 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 	x %= world_size    # cyclic truncate
 	y %= world_size
 	*/
-
+	std::cout << "Debug : particle_filter.cpp : Enter pf.prediction  " << std::endl;
+	std::cout << "Debug : input delta_t is " << delta_t  << std::endl;
+	std::cout << "Debug : input velocity is " << velocity << std::endl;
+	std::cout << "Debug : before prediction : Particle 0 has position "
+		<< particles[0].x << " " << particles[0].y << std::endl;
 	// std::default_random_engine gen;
 	std::normal_distribution<double> x_distribution(0.0, std_pos[0]);
 	std::normal_distribution<double> y_distribution(0.0, std_pos[1]);
@@ -112,6 +129,9 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 		particles[i].y += y_distribution(gen);
 		particles[i].theta += theta_distribution(gen);
 	}
+	std::cout << "Debug : after prediction : Particle 0 has position "
+		<< particles[0].x << " " << particles[0].y << std::endl;
+	std::cout << "Debug : particle_filter.cpp : Exit pf.prediction  \n" << std::endl;
 	
 }
 
@@ -159,6 +179,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
    *   and the following is a good resource for the actual equation to implement
    *   (look at equation 3.33) http://planning.cs.uiuc.edu/node99.html
    */
+
+	std::cout << "Debug : particle_filter.cpp : Enter pf.updateWeights  " << std::endl;
+	std::cout << "Debug : weights[0] before update is " << weights[0] << std::endl;
 	vector<LandmarkObs> obs_map_coord_j;
 	vector<int> nearest_landmarks_ids;
 	for (int j = 0; j < particles.size(); j++) {
@@ -177,9 +200,12 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		nearest_landmarks_ids = dataAssociation(obs_map_coord_j, map_landmarks);
 		
 		// Calculate and update weights[j]
-		particles[j].weight = multiv_prob_vector(obs_map_coord_j, map_landmarks, nearest_landmarks_ids, std_landmark);
+		particles[j].weight = multiv_prob_vector(obs_map_coord_j, map_landmarks, 
+			nearest_landmarks_ids, std_landmark);
 		weights[j] = particles[j].weight;
 	}
+	std::cout << "Debug : weights[0] after update is " << weights[0] << std::endl;
+	std::cout << "Debug : particle_filter.cpp : Exit pf.updateWeights  \n" << std::endl;
 
 }
 
@@ -193,6 +219,9 @@ void ParticleFilter::resample() {
    *   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
    */
 	
+	std::cout << "Debug : particle_filter.cpp : Enter pf.resample  " << std::endl;
+	std::cout << "Debug : before resample : Particle 0 has position "
+		<< particles[0].x << " " << particles[0].y << std::endl;
 	// std::default_random_engine generator;
 	// Create the distribution with those weights
 	std::discrete_distribution<int> distribution_weights(weights.begin(), weights.end());
@@ -204,7 +233,9 @@ void ParticleFilter::resample() {
 		resampled_particles.push_back(particles[index]);
 	}
 	particles = resampled_particles;
-
+	std::cout << "Debug : after resample : Particle 0 has position "
+		<< particles[0].x << " " << particles[0].y << std::endl;
+	std::cout << "Debug : particle_filter.cpp : Exit pf.resample  \n" << std::endl;
 }
 
 void ParticleFilter::SetAssociations(Particle& particle, 
