@@ -34,7 +34,7 @@ void ParticleFilter::init(double x, double y, double theta, double std1[]) {
 	 * NOTE: Consult particle_filter.h for more information about this method
 	 *   (and others in this file).
 	 */
-	num_particles = 10;  // TODO: Set the number of particles
+	num_particles = 100;  // TODO: Set the number of particles
 	// fill(weights.begin(), weights.end(), 1.0/ num_particles);   // initialize to even weights
 
 	// Create normal distribution for each state:
@@ -54,9 +54,9 @@ void ParticleFilter::init(double x, double y, double theta, double std1[]) {
 		weights.push_back(1.0);
 
 		// The following members remain unchanged. 
-		/*particles[i].associations;
-		particles[i].sense_x;
-		particles[i].sense_y;*/
+  // 	  particles[i].associations;
+  // 	  particles[i].sense_x;
+  // 	  particles[i].sense_y;
 	}
 
 
@@ -165,8 +165,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	 */
 
 
-	vector<int> nearest_landmarks_ids;
-
 	for (int j = 0; j < num_particles; j++) {
 
 		// Record the association.
@@ -178,11 +176,22 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		// Change observation to map coordinates 
 		vector<LandmarkObs> obs_map_coord_j = changeCoordinates(particles[j], observations);
 		// Association: Get the indices in map markers for the nearest landmarks for each observation in obs_map_coord_j.
-		nearest_landmarks_ids = dataAssociation(obs_map_coord_j, map_landmarks);
+		vector<int> nearest_landmarks_ids = dataAssociation(obs_map_coord_j, map_landmarks);
 		// Calculate and update weights[j]
 		particles[j].weight = multiv_prob_vector(obs_map_coord_j, map_landmarks,
 			nearest_landmarks_ids, std_landmark);
 		weights[j] = particles[j].weight;
+
+		for (int i = 0; i < nearest_landmarks_ids.size(); i++) {
+			int ind = nearest_landmarks_ids[i];
+			particles[j].associations.clear();
+			particles[j].sense_x.clear();
+			particles[j].sense_y.clear();
+			particles[j].associations.push_back(map_landmarks.landmark_list[ind].id_i);
+			particles[j].sense_x.push_back(map_landmarks.landmark_list[ind].x_f);
+			particles[j].sense_y.push_back(map_landmarks.landmark_list[ind].y_f);
+		}
+
 	}
 
 
