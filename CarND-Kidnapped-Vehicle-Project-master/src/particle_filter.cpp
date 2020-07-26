@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 
-#include "helper_functions.h" // Need this for sampling from distributions
+// #include "helper_functions.h" // Need this for sampling from distributions
 // need to use std::normal_distribution;
 
 

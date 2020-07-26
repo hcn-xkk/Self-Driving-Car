@@ -74,7 +74,7 @@ struct LandmarkObs {
 vector<LandmarkObs> changeCoordinates(Particle particle, vector<LandmarkObs> observations) {
 	vector<LandmarkObs> obs_map_coord;
 	// transform to map coordinates
-	for (auto i = observations.begin(); i < observations.end(); i++) {
+	for (int i = 0; i < observations.size(); i++) {
 		auto obs = observations[i];
 		obs_map_coord[i].x = particle.x + (cos(particle.theta) * obs.x) - (sin(particle.theta) * obs.y);
 		obs_map_coord[i].y = particle.y + (sin(particle.theta) * obs.x) + (cos(particle.theta) * obs.y);
