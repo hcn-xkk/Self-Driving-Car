@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 #include "map.h"
-#include "multiv_gauss.h"
+//#include "multiv_gauss.h"
 
 // for portability of M_PI (Vis Studio, MinGW, etc.)
 #ifndef M_PI
@@ -67,14 +67,37 @@ vector<LandmarkObs> changeCoordinates(Particle particle, vector<LandmarkObs> obs
 	return obs_map_coord;
 }
 
+/**
+ * Compute pdf for 2d multivariant normal distribution.
+ * @param sig_x, sig_y
+ * @param observations, vector of landmark observations.
+ * @output Euclidean distance between two 2D points
+ */
+double multiv_prob(double mu_x, double mu_y, double sig_x, double sig_y, 
+	double x_obs, double y_obs) {
+	// calculate normalization term
+	double gauss_norm;
+	gauss_norm = 1 / (2 * M_PI * sig_x * sig_y);
+
+	// calculate exponent
+	double exponent;
+	exponent = (pow(x_obs - mu_x, 2) / (2 * pow(sig_x, 2)))
+		+ (pow(y_obs - mu_y, 2) / (2 * pow(sig_y, 2)));
+
+	// calculate weight using normalization terms and exponent
+	double weight;
+	weight = gauss_norm * exp(-exponent);
+
+	return weight;
+}
 
 double multiv_prob_vector(vector<LandmarkObs> obs_map_coord, const Map &map_landmarks, vector<int> nearest_landmarks_ids, double std_landmark[]) {
 	size_t size_type = nearest_landmarks_ids.size();
 	double particle_likelihood = 1.0;
 	for (int i = 0; i < size_type; i++) {
 		particle_likelihood *= multiv_prob(map_landmarks[nearest_landmarks_ids[i]].x, 
-			map_landmarks[nearest_landmarks_ids[i]].y, obs_map_coord[i].x, obs_map_coord[i].y, 
-			std_landmark[0], std_landmark[1]);
+			map_landmarks[nearest_landmarks_ids[i]].y, std_landmark[0], std_landmark[1], 
+			obs_map_coord[i].x, obs_map_coord[i].y);
 	}
 	return particle_likelihood;
 
