@@ -86,8 +86,10 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 	std::normal_distribution<double> theta_distribution(0.0, std_pos[2]);
 
 	for (int i = 0; i < num_particles; i++) {
-		particles[i].theta += yaw_rate * delta_t + theta_distribution(gen);
-		particles[i].theta %= 2 * M_PI; 
+		particles[i].theta += yaw_rate * delta_t + theta_distribution(gen) + 2 * M_PI;
+		while (particles[i].theta >= 2 * M_PI) {
+			particles[i].theta -= 2 * M_PI;
+		}
 		double dist = delta_t * velocity;
 		particles[i].x += dist * cos(particles[i].theta) + x_distribution(gen);
 		particles[i].y += dist * sin(particles[i].theta) + y_distribution(gen);
