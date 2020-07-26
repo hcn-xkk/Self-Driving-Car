@@ -17,6 +17,8 @@
 #include "map.h"
 //#include "multiv_gauss.h"
 
+using std::vector;
+
 // for portability of M_PI (Vis Studio, MinGW, etc.)
 #ifndef M_PI
 const double M_PI = 3.14159265358979323846;
