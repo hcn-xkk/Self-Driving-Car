@@ -48,13 +48,22 @@ public:
 		double yaw_rate);
 
 	/**
+	 * selectNearbyLandmarksIndices Finds the nearby landmarks' indices.
+	 * @param particle
+	 * @param landmark observations
+	 */
+	vector<int> selectNearbyLandmarksIndices(Particle particle, const Map &map_landmarks, double radius);
+
+
+	/**
 	 * dataAssociation Finds which observations correspond to which landmarks
 	 *   (likely by using a nearest-neighbors data association).
 	 * @param predicted Vector of predicted landmark observations
-	 * @param observations Vector of landmark observations
+	 * @param landmark observations
+	 * @param list of indices of map_landmarks to select from
 	 */
 	vector<int> dataAssociation(vector<LandmarkObs> predicted,
-		const Map &map_landmarks);
+		const Map &map_landmarks, vector<int> selected_indices);
 
 	/**
 	 * updateWeights Updates the weights for each particle based on the likelihood

@@ -119,8 +119,24 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 
 }
 
+
+vector<int> ParticleFilter::selectNearbyLandmarksIndices(Particle particle, const Map &map_landmarks, double radius) {
+	vector<int> nearby_landmarks_ids;
+	for (int i = 0; i < map_landmarks.landmark_list.size(); i++) {
+		// Select a square area to be efficient
+		if ((std::fabs(map_landmarks.landmark_list[i].x_f - particle.x) < radius) &&
+			(std::fabs(map_landmarks.landmark_list[i].y_f - particle.y) < radius)) {
+			nearby_landmarks_ids.push_back(i);
+		}
+	}
+
+	return nearby_landmarks_ids;
+
+}
+
+
 vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
-	const Map &map_landmarks) {
+	const Map &map_landmarks, vector<int> selected_indices) {
 	/**
 	 * TODO: Find the predicted measurement that is closest to each
 	 *   observed measurement and assign the observed measurement to this
@@ -134,18 +150,20 @@ vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
 	for (int i = 0; i < predicted.size(); i++) {
 		// Calculate distance of all landmarks to the landmark observation predicted[i]
 		vector <double> dist_arr_i;
-		for (int j = 0; j < map_landmarks.landmark_list.size(); j++) {
+		for (int j = 0; j < selected_indices.size(); j++) {
 			dist_arr_i.push_back(dist(predicted[i].x, predicted[i].y,
-				map_landmarks.landmark_list[j].x_f, map_landmarks.landmark_list[j].y_f));
+				map_landmarks.landmark_list[selected_indices[j]].x_f, map_landmarks.landmark_list[selected_indices[j]].y_f));
 		}
 
 		// Find the index of the nearest landmark 
-		nearest_landmarks_ids[i] = findMinElementIndex(dist_arr_i);
+		int index_in_selected_indices = findMinElementIndex(dist_arr_i);
+		nearest_landmarks_ids[i] = selected_indices[index_in_selected_indices];
 	}
 
 	return nearest_landmarks_ids;
 
 }
+
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	const vector<LandmarkObs> &observations,
@@ -164,24 +182,22 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	 *   (look at equation 3.33) http://planning.cs.uiuc.edu/node99.html
 	 */
 
-
 	for (int j = 0; j < num_particles; j++) {
 
-		// Record the association.
-// 		for (int i = 0; i < observations.size(); i++) {
-// 			particles[j].associations.push_back(observations[i].id);
-// 			particles[j].sense_x.push_back(observations[i].x);
-// 			particles[j].sense_y.push_back(observations[i].y);
-// 		}
 		// Change observation to map coordinates 
 		vector<LandmarkObs> obs_map_coord_j = changeCoordinates(particles[j], observations);
+
+		// First find the nearby marker's map indices
+		vector<int> nearby_landmarks_ids = selectNearbyLandmarksIndices(particles[j], map_landmarks, sensor_range);
+
 		// Association: Get the indices in map markers for the nearest landmarks for each observation in obs_map_coord_j.
-		vector<int> nearest_landmarks_ids = dataAssociation(obs_map_coord_j, map_landmarks);
+		vector<int> nearest_landmarks_ids = dataAssociation(obs_map_coord_j, map_landmarks, nearby_landmarks_ids);
 		// Calculate and update weights[j]
 		particles[j].weight = multiv_prob_vector(obs_map_coord_j, map_landmarks,
 			nearest_landmarks_ids, std_landmark);
 		weights[j] = particles[j].weight;
 
+		// Record the association.
 		particles[j].associations.clear();
 		particles[j].sense_x.clear();
 		particles[j].sense_y.clear();
@@ -193,7 +209,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		}
 
 	}
-
 
 }
 
