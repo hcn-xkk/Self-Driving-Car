@@ -98,7 +98,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 }
 
 vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
-											vector<Map::single_landmark_s>& landmark_list) {
+	const Map &map_landmarks) {
   /**
    * TODO: Find the predicted measurement that is closest to each 
    *   observed measurement and assign the observed measurement to this 
@@ -111,9 +111,9 @@ vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
 	vector<int> nearest_landmarks_ids(predicted.size(), 0);
 	for (int i = 0; i < predicted.size(); i++) {
 		// Calculate distance of all landmarks to the landmark observation predicted[i]
-		double dist_arr_i[landmark_list.size()];
-		for (int j = 0; j < landmark_list.size(); j++) {
-			dist_arr_i[j] = dist(predicted[i].x, predicted[i].y, landmark_list[j].x_f, landmark_list[j].y_f);
+		double dist_arr_i[map_landmarks.landmark_list.size()];
+		for (int j = 0; j < map_landmarks.landmark_list.size(); j++) {
+			dist_arr_i[j] = dist(predicted[i].x, predicted[i].y, map_landmarks.landmark_list[j].x_f, map_landmarks.landmark_list[j].y_f);
 		}
 
 		// Find the index of the nearest landmark 
@@ -155,7 +155,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 		obs_map_coord_j = changeCoordinates(particles[j], observations);
 
 		// Association: Get the indices in map markers for the nearest landmarks for each observation in obs_map_coord_j.
-		nearest_landmarks_ids = dataAssociation(obs_map_coord_j, map_landmarks.landmark_list);
+		nearest_landmarks_ids = dataAssociation(obs_map_coord_j, map_landmarks);
 		
 		// Calculate and update weights[j]
 		particles[j].weight = multiv_prob_vector(obs_map_coord_j, map_landmarks, nearest_landmarks_ids, std_landmark);
