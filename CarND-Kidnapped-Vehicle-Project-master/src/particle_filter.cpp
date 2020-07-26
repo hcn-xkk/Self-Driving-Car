@@ -43,15 +43,17 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
 
   // Initialize particles locations by GPS measurements with random noise.
   for (int i = 0; i < num_particles; i++) {
-	  particles[i].x = pos_x(gen);
-	  particles[i].y = pos_y(gen);
-	  particles[i].theta = pos_theta(gen);
-	  particles[i].weight = weights[i];
-	  
+	  Particle p;
+	  p.x = pos_x(gen);
+	  p.y = pos_y(gen);
+	  p.theta = pos_theta(gen);
+	  p.weight = weights[i];
+	  particles.push_back(p);
+
 	  // The following members remain unchanged. 
-	  particles[i].associations;
+	  /*particles[i].associations;
 	  particles[i].sense_x;
-	  particles[i].sense_y;
+	  particles[i].sense_y;*/
   }
 
   // Set state var initilzed.
