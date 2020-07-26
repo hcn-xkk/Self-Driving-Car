@@ -16,7 +16,9 @@
 #include <string>
 #include <vector>
 
-#include "helper_functions.h"
+#include "helper_functions.h" // Need this for sampling from distributions
+// need to use std::normal_distribution;
+
 
 using std::string;
 using std::vector;
@@ -31,6 +33,29 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    *   (and others in this file).
    */
   num_particles = 0;  // TODO: Set the number of particles
+  fill(weights.begin(), weights.end(), 1.0/ num_particles);   // initialize to even weights
+  
+  // Create normal distribution for each state:
+  std::default_random_engine gen; 
+  std::normal_distribution<double> pos_x(x, std[0]);
+  std::normal_distribution<double> pos_y(y, std[1]);
+  std::normal_distribution<double> theta(theta, std[2]);
+
+  // Initialize particles locations by GPS measurements with random noise.
+  for (int i = 0; i < num_particles; i++) {
+	  particles[i].x = pos_x(gen);
+	  particles[i].y = pos_y(gen);
+	  particles[i].theta = theta(gen);
+	  particles[i].weight = weights[i];
+	  
+	  // The following members remain unchanged. 
+	  particles[i].associations;
+	  particles[i].sense_x;
+	  particles[i].sense_y;
+  }
+
+  // Set state var initilzed.
+  is_initialized = true;
 
 }
 
@@ -43,11 +68,35 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
    *  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
    *  http://www.cplusplus.com/reference/random/default_random_engine/
    */
+	/*
+	# turn, and add randomness to the turning command
+	orientation = self.orientation + float(turn) + random.gauss(0.0, self.turn_noise)
+	orientation %= 2 * pi
+	# move, and add randomness to the motion command
+	dist = float(forward) + random.gauss(0.0, self.forward_noise)
+	x = self.x + (cos(orientation) * dist)
+	y = self.y + (sin(orientation) * dist)
+	x %= world_size    # cyclic truncate
+	y %= world_size
+	*/
 
+	std::default_random_engine gen;
+	std::normal_distribution<double> x_distribution(0.0, std_pos[0]);
+	std::normal_distribution<double> y_distribution(0.0, std_pos[1]);
+	std::normal_distribution<double> theta_distribution(0.0, std_pos[2]);
+
+	for (int i = 0; i < num_particles; i++) {
+		particles[i].theta += yaw_rate * delta_t + theta_distribution(gen);
+		particles[i].theta %= 2 * M_PI; 
+		double dist = delta_t * velocity;
+		particles[i].x += dist * cos(particles[i].theta) + x_distribution(gen);
+		particles[i].y += dist * sin(particles[i].theta) + y_distribution(gen);
+	}
+	
 }
 
-void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted, 
-                                     vector<LandmarkObs>& observations) {
+vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
+											vector<Map::single_landmark_s>& landmark_list) {
   /**
    * TODO: Find the predicted measurement that is closest to each 
    *   observed measurement and assign the observed measurement to this 
@@ -56,6 +105,20 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   probably find it useful to implement this method and use it as a helper 
    *   during the updateWeights phase.
    */
+	// Initialize nearest_landmarks_ids
+	vector<int> nearest_landmarks_ids(predicted.size(), 0);
+	for (int i = 0; i < predicted.size(); i++) {
+		// Calculate distance of all landmarks to the landmark observation predicted[i]
+		double dist_arr_i[landmark_list.size()];
+		for (int j = 0; j < landmark_list.size(); j++) {
+			dist_arr_i[j] = dist(predicted[i].x, predicted[i].y, landmark_list[j].x_f, landmark_list[j].y_f);
+		}
+
+		// Find the index of the nearest landmark 
+		nearest_landmarks_ids[i] = std::min_element(dist_arr_i.begin(), dist_arr_i.end());
+	}
+
+	return nearest_landmarks_ids;
 
 }
 
@@ -75,6 +138,27 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
    *   and the following is a good resource for the actual equation to implement
    *   (look at equation 3.33) http://planning.cs.uiuc.edu/node99.html
    */
+	vector<LandmarkObs> obs_map_coord_j;
+	vector<int> nearest_landmarks_ids;
+	for (int j = 0; j < particles.size(); j++) {
+
+		// Record the association.
+		for (auto i = observations.begin(); i < observations.end(); i++) {
+			particles[j].associations.push_back(observations[i].id);
+			particles[j].sense_x.push_back(observations[i].x);
+			particles[j].sense_y.push_back(observations[i].y);
+		}
+		
+		// Change observation to map coordinates 
+		obs_map_coord_j = changeCoordinates(particles[j], observations);
+
+		// Association: Get the indices in map markers for the nearest landmarks for each observation in obs_map_coord_j.
+		nearest_landmarks_ids = dataAssociation(obs_map_coord_j, map_landmarks.landmark_list);
+		
+		// Calculate and update weights[j]
+		particles[j].weight = multiv_prob_vector(obs_map_coord_j, map_landmarks, nearest_landmarks_ids, std_landmark);
+		weights[j] = particles[j].weight;
+	}
 
 }
 
@@ -83,8 +167,21 @@ void ParticleFilter::resample() {
    * TODO: Resample particles with replacement with probability proportional 
    *   to their weight. 
    * NOTE: You may find std::discrete_distribution helpful here.
+   * Random number distribution that produces integer values according to a discrete distribution, 
+   * where each possible value has a predefined probability of being produced
    *   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
    */
+	
+	std::default_random_engine generator;
+	// Create the distribution with those weights
+	std::discrete_distribution<int> distribution weights(weights.begin(), weights.end());
+
+	// Create a temporary var: resampled_particles
+	vector <Particle> resampled_particles;
+	for (int i = 0; i < num_particles; i++) {
+		resampled_particles.push_back(particles[index]);
+	}
+	particles = resampled_particles;
 
 }
 
