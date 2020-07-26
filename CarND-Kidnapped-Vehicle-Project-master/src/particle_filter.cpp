@@ -118,7 +118,7 @@ vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
 		}
 
 		// Find the index of the nearest landmark 
-		nearest_landmarks_ids[i] = std::min_element(dist_arr_i.begin(), dist_arr_i.end();
+		nearest_landmarks_ids[i] = std::min_element(dist_arr_i.begin(), dist_arr_i.end());
 	}
 
 	return nearest_landmarks_ids;
@@ -177,11 +177,12 @@ void ParticleFilter::resample() {
 	
 	std::default_random_engine generator;
 	// Create the distribution with those weights
-	std::discrete_distribution<int> distribution weights(weights.begin(), weights.end());
+	std::discrete_distribution<int> distribution_weights(weights.begin(), weights.end());
 
 	// Create a temporary var: resampled_particles
 	vector <Particle> resampled_particles;
 	for (int i = 0; i < num_particles; i++) {
+		int index = distribution_weights(generator);
 		resampled_particles.push_back(particles[index]);
 	}
 	particles = resampled_particles;
