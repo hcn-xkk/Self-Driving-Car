@@ -112,8 +112,8 @@ double multiv_prob_vector(vector<LandmarkObs> obs_map_coord, const Map &map_land
 	double particle_likelihood = 1.0;
 	for (int i = 0; i < size_type; i++) {
 		int index = nearest_landmarks_ids[i];
-		particle_likelihood *= multiv_prob(map_landmarks[index].x,
-			map_landmarks[index].y, std_landmark[0], std_landmark[1],
+		particle_likelihood *= multiv_prob(map_landmarks.landmark_list[index].x,
+			map_landmarks.landmark_list[index].y, std_landmark[0], std_landmark[1],
 			obs_map_coord[i].x, obs_map_coord[i].y);
 	}
 	return particle_likelihood;
