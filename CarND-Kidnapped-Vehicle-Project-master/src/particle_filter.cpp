@@ -22,6 +22,7 @@
 
 using std::string;
 using std::vector;
+std::default_random_engine gen;
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
@@ -36,7 +37,7 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   fill(weights.begin(), weights.end(), 1.0/ num_particles);   // initialize to even weights
   
   // Create normal distribution for each state:
-  std::default_random_engine gen; 
+  
   std::normal_distribution<double> pos_x(x, std[0]);
   std::normal_distribution<double> pos_y(y, std[1]);
   std::normal_distribution<double> pos_theta(theta, std[2]);
@@ -82,7 +83,7 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 	y %= world_size
 	*/
 
-	std::default_random_engine gen;
+	// std::default_random_engine gen;
 	std::normal_distribution<double> x_distribution(0.0, std_pos[0]);
 	std::normal_distribution<double> y_distribution(0.0, std_pos[1]);
 	std::normal_distribution<double> theta_distribution(0.0, std_pos[2]);
@@ -177,14 +178,14 @@ void ParticleFilter::resample() {
    *   http://en.cppreference.com/w/cpp/numeric/random/discrete_distribution
    */
 	
-	std::default_random_engine generator;
+	// std::default_random_engine generator;
 	// Create the distribution with those weights
 	std::discrete_distribution<int> distribution_weights(weights.begin(), weights.end());
 
 	// Create a temporary var: resampled_particles
 	vector <Particle> resampled_particles;
 	for (int i = 0; i < num_particles; i++) {
-		int index = distribution_weights(generator);
+		int index = distribution_weights(gen);
 		resampled_particles.push_back(particles[index]);
 	}
 	particles = resampled_particles;
