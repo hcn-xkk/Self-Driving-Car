@@ -1,16 +1,15 @@
 /**
  * particle_filter.h
  * 2D particle filter class.
- *
- * Created on: Dec 12, 2016
- * Author: Tiffany Huang
+ * Kidnapped vehicle project from Udacity Self-Driving Car Engineer nanodegree
+ * Finished on July 26, 2020
+ * Author: Chunan Huang
  */
+
 
 #ifndef PARTICLE_FILTER_H_
 #define PARTICLE_FILTER_H_
 
-#include <string>
-#include <vector>
 #include "helper_functions.h"
 
 

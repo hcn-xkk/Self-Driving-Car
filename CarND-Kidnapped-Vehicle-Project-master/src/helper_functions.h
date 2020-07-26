@@ -1,10 +1,11 @@
 /**
  * helper_functions.h
  * Some helper functions for the 2D particle filter.
- *
- * Created on: Dec 13, 2016
- * Author: Tiffany Huang
+ * Kidnapped vehicle project from Udacity Self-Driving Car Engineer nanodegree
+ * Finished on July 26, 2020
+ * Author: Chunan Huang
  */
+
 
 #ifndef HELPER_FUNCTIONS_H_
 #define HELPER_FUNCTIONS_H_
@@ -17,7 +18,11 @@
 #include "map.h"
 #include <iostream>
 #include <cmath>
- //#include "multiv_gauss.h"
+
+#include <iterator>
+#include <numeric>
+#include <random>
+#include <string>
 
 using std::vector;
 
@@ -27,7 +32,9 @@ using std::vector;
 const double M_PI = 3.14159265358979323846;
 #endif
 
-// Move from particle-filter.h to here.
+/**
+ * Struct representing one particle.
+ */
 struct Particle {
 	int id;
 	double x;
@@ -40,7 +47,6 @@ struct Particle {
 };
 
 
-
 /**
  * Struct representing one position/control measurement.
  */
@@ -48,6 +54,7 @@ struct control_s {
 	double velocity;  // Velocity [m/s]
 	double yawrate;   // Yaw rate [rad/s]
 };
+
 
 /**
  * Struct representing one ground truth position.
@@ -58,17 +65,22 @@ struct ground_truth {
 	double theta; // Global vehicle yaw [rad]
 };
 
+
 /**
  * Struct representing one landmark observation measurement.
  */
 struct LandmarkObs {
-
 	int id;     // Id of matching landmark in the map.
 	double x;   // Local (vehicle coords) x position of landmark observation [m]
 	double y;   // Local (vehicle coords) y position of landmark observation [m]
 };
 
 
+/**
+ * Compute the index for the minimum elementment in a vector
+ * @param dist_arr_i: input vector
+ * @output int index for the minimum element.
+ */
 inline int findMinElementIndex(vector < double > dist_arr_i) {
 	int min_index = 0;
 	for (int i = 0; i < dist_arr_i.size(); i++) {
@@ -88,8 +100,6 @@ inline int findMinElementIndex(vector < double > dist_arr_i) {
  */
 inline vector<LandmarkObs> changeCoordinates(Particle particle, const vector<LandmarkObs> &observations) {
 	vector<LandmarkObs> obs_map_coord;
-	// transform to map coordinates
-
 	for (int i = 0; i < observations.size(); i++) {
 		LandmarkObs obs = observations[i];
 		LandmarkObs obs_map_coord_i;
@@ -100,6 +110,7 @@ inline vector<LandmarkObs> changeCoordinates(Particle particle, const vector<Lan
 	}
 	return obs_map_coord;
 }
+
 
 /**
  * Compute pdf for 2d multivariant normal distribution.
@@ -125,6 +136,15 @@ inline double multiv_prob(double mu_x, double mu_y, double sig_x, double sig_y,
 	return weight;
 }
 
+
+/**
+ * Compute likelihood for a vector of 2d multivariant normal samples.
+ * @param obs_map_coord: vector of landmark observations
+ * @param map_landmarks: Map object for landmarks
+ * @param nearest_landmarks_ids: vector of indices for the landmarks in map_landmarks associated with obs_map_coord
+ * @param std_landmark: standard deviation in 2D
+ * @output Euclidean distance between two 2D points
+ */
 inline double multiv_prob_vector(vector<LandmarkObs> obs_map_coord, const Map &map_landmarks, vector<int> nearest_landmarks_ids, double std_landmark[]) {
 	size_t size_type = nearest_landmarks_ids.size();
 	double particle_likelihood = 1.0;
@@ -135,9 +155,7 @@ inline double multiv_prob_vector(vector<LandmarkObs> obs_map_coord, const Map &m
 			obs_map_coord[i].x, obs_map_coord[i].y);
 	}
 	return particle_likelihood;
-
 }
-
 
 
 /**
@@ -149,6 +167,7 @@ inline double multiv_prob_vector(vector<LandmarkObs> obs_map_coord, const Map &m
 inline double dist(double x1, double y1, double x2, double y2) {
 	return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 }
+
 
 /**
  * Computes the error between ground truth and particle filter data.
@@ -168,6 +187,7 @@ inline double * getError(double gt_x, double gt_y, double gt_theta, double pf_x,
 	}
 	return error;
 }
+
 
 /**
  * Reads map data from a file.
@@ -213,6 +233,7 @@ inline bool read_map_data(std::string filename, Map& map) {
 	return true;
 }
 
+
 /**
  * Reads control data from a file.
  * @param filename Name of file containing control measurements.
@@ -254,6 +275,7 @@ inline bool read_control_data(std::string filename,
 	}
 	return true;
 }
+
 
 /**
  * Reads ground truth data from a file.
@@ -297,6 +319,7 @@ inline bool read_gt_data(std::string filename, std::vector<ground_truth>& gt) {
 	}
 	return true;
 }
+
 
 /**
  * Reads landmark observation data from a file.

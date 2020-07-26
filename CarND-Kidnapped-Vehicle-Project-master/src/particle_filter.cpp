@@ -1,24 +1,11 @@
 /**
  * particle_filter.cpp
- *
- * Created on: Dec 12, 2016
- * Author: Tiffany Huang
+ * Kidnapped vehicle project from Udacity Self-Driving Car Engineer nanodegree
+ * Finished on July 26, 2020
+ * Author: Chunan Huang
  */
 
 #include "particle_filter.h"
-
-#include <math.h>
-#include <algorithm>
-#include <iostream>
-#include <iterator>
-#include <numeric>
-#include <random>
-#include <string>
-#include <vector>
-
-#include "helper_functions.h" // Need this for sampling from distributions
- // need to use std::normal_distribution;
-
 
 using std::string;
 using std::vector;
@@ -59,7 +46,6 @@ void ParticleFilter::init(double x, double y, double theta, double std1[]) {
   // 	  particles[i].sense_y;
 	}
 
-
 	// Set state var initilzed.
 	is_initialized = true;
 
@@ -92,14 +78,6 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 	std::normal_distribution<double> theta_distribution(0.0, std_pos[2]);
 
 	for (int i = 0; i < num_particles; i++) {
-		/*particles[i].theta += yaw_rate * delta_t + theta_distribution(gen) + 2 * M_PI;
-		while (particles[i].theta >= 2 * M_PI) {
-			particles[i].theta -= 2 * M_PI;
-		}
-		double dist = delta_t * velocity;
-		particles[i].x += dist * cos(particles[i].theta) + x_distribution(gen);
-		particles[i].y += dist * sin(particles[i].theta) + y_distribution(gen);
-	*/
 	// calculate new state
 		if (fabs(yaw_rate) < 0.00001) {
 			particles[i].x += velocity * delta_t * cos(particles[i].theta);

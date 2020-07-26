@@ -1,6 +1,6 @@
 /**
  * map.h
- *
+ * Kidnapped vehicle project from Udacity Self-Driving Car Engineer nanodegree
  * Created on: Dec 12, 2016
  * Author: mufferm
  */
