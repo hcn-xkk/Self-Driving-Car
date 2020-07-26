@@ -13,16 +13,6 @@
 #include <vector>
 #include "helper_functions.h"
 
-struct Particle {
-  int id;
-  double x;
-  double y;
-  double theta;
-  double weight;
-  std::vector<int> associations;
-  std::vector<double> sense_x;
-  std::vector<double> sense_y;
-};
 
 
 class ParticleFilter {  

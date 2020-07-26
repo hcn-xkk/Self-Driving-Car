@@ -24,6 +24,20 @@ using std::vector;
 const double M_PI = 3.14159265358979323846;
 #endif
 
+// Move from particle-filter.h to here.
+struct Particle {
+	int id;
+	double x;
+	double y;
+	double theta;
+	double weight;
+	std::vector<int> associations;
+	std::vector<double> sense_x;
+	std::vector<double> sense_y;
+};
+
+
+
 /**
  * Struct representing one position/control measurement.
  */
