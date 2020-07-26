@@ -39,13 +39,13 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
   std::default_random_engine gen; 
   std::normal_distribution<double> pos_x(x, std[0]);
   std::normal_distribution<double> pos_y(y, std[1]);
-  std::normal_distribution<double> theta(theta, std[2]);
+  std::normal_distribution<double> pos_theta(theta, std[2]);
 
   // Initialize particles locations by GPS measurements with random noise.
   for (int i = 0; i < num_particles; i++) {
 	  particles[i].x = pos_x(gen);
 	  particles[i].y = pos_y(gen);
-	  particles[i].theta = theta(gen);
+	  particles[i].theta = pos_theta(gen);
 	  particles[i].weight = weights[i];
 	  
 	  // The following members remain unchanged. 
