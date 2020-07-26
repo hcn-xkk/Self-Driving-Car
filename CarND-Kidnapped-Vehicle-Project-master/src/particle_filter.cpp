@@ -111,13 +111,14 @@ vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
 	vector<int> nearest_landmarks_ids(predicted.size(), 0);
 	for (int i = 0; i < predicted.size(); i++) {
 		// Calculate distance of all landmarks to the landmark observation predicted[i]
-		double dist_arr_i[map_landmarks.landmark_list.size()];
+		vector <double> dist_arr_i;
 		for (int j = 0; j < map_landmarks.landmark_list.size(); j++) {
-			dist_arr_i[j] = dist(predicted[i].x, predicted[i].y, map_landmarks.landmark_list[j].x_f, map_landmarks.landmark_list[j].y_f);
+			dist_arr_i.push_back( dist(predicted[i].x, predicted[i].y, 
+				map_landmarks.landmark_list[j].x_f, map_landmarks.landmark_list[j].y_f) );
 		}
 
 		// Find the index of the nearest landmark 
-		nearest_landmarks_ids[i] = std::min_element(dist_arr_i.begin(), dist_arr_i.end());
+		nearest_landmarks_ids[i] = std::min_element(dist_arr_i.begin(), dist_arr_i.end();
 	}
 
 	return nearest_landmarks_ids;
