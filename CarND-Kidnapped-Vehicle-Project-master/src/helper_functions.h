@@ -83,14 +83,17 @@ inline int findMinElementIndex(vector < double > dist_arr_i) {
  * @param observations, vector of landmark observations.
  * @output Euclidean distance between two 2D points
  */
-inline vector<LandmarkObs> changeCoordinates(Particle particle, vector<LandmarkObs> observations) {
+inline vector<LandmarkObs> changeCoordinates(Particle particle, const vector<LandmarkObs> &observations) {
 	vector<LandmarkObs> obs_map_coord;
 	// transform to map coordinates
+
 	for (int i = 0; i < observations.size(); i++) {
-		auto obs = observations[i];
-		obs_map_coord[i].x = particle.x + (cos(particle.theta) * obs.x) - (sin(particle.theta) * obs.y);
-		obs_map_coord[i].y = particle.y + (sin(particle.theta) * obs.x) + (cos(particle.theta) * obs.y);
-		obs_map_coord[i].id = obs.id;
+		LandmarkObs obs = observations[i];
+		LandmarkObs obs_map_coord_i;
+		obs_map_coord_i.x = particle.x + (std::cos(particle.theta) * obs.x) - (std::sin(particle.theta) * obs.y);
+		obs_map_coord_i.y = particle.y + (std::sin(particle.theta) * obs.x) + (std::cos(particle.theta) * obs.y);
+		obs_map_coord_i.id = obs.id;
+		obs_map_coord.push_back(obs_map_coord_i);
 	}
 	return obs_map_coord;
 }
