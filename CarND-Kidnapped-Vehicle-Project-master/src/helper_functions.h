@@ -65,6 +65,18 @@ struct LandmarkObs {
   double y;   // Local (vehicle coords) y position of landmark observation [m]
 };
 
+
+int findMinElementIndex(vector < double > dist_arr_i) {
+	int min_index = 0;
+	for (int i = 0; i < dist_arr_i.size(); i++) {
+		if (dist_arr_i[i] < dist_arr_i[min_index]) {
+			min_index = i;
+		}
+	}
+	return min_index;
+}
+
+
 /**
  * Compute observations in global coordinates.
  * @param particle. 

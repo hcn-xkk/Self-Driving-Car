@@ -118,7 +118,7 @@ vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
 		}
 
 		// Find the index of the nearest landmark 
-		nearest_landmarks_ids[i] = std::min_element(dist_arr_i.begin(), dist_arr_i.end());
+		nearest_landmarks_ids[i] = findMinElementIndex(dist_arr_i);
 	}
 
 	return nearest_landmarks_ids;
