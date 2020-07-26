@@ -66,7 +66,7 @@ struct LandmarkObs {
 };
 
 
-int findMinElementIndex(vector < double > dist_arr_i) {
+inline int findMinElementIndex(vector < double > dist_arr_i) {
 	int min_index = 0;
 	for (int i = 0; i < dist_arr_i.size(); i++) {
 		if (dist_arr_i[i] < dist_arr_i[min_index]) {
@@ -83,7 +83,7 @@ int findMinElementIndex(vector < double > dist_arr_i) {
  * @param observations, vector of landmark observations.
  * @output Euclidean distance between two 2D points
  */
-vector<LandmarkObs> changeCoordinates(Particle particle, vector<LandmarkObs> observations) {
+inline vector<LandmarkObs> changeCoordinates(Particle particle, vector<LandmarkObs> observations) {
 	vector<LandmarkObs> obs_map_coord;
 	// transform to map coordinates
 	for (int i = 0; i < observations.size(); i++) {
@@ -101,7 +101,7 @@ vector<LandmarkObs> changeCoordinates(Particle particle, vector<LandmarkObs> obs
  * @param observations, vector of landmark observations.
  * @output Euclidean distance between two 2D points
  */
-double multiv_prob(double mu_x, double mu_y, double sig_x, double sig_y, 
+inline double multiv_prob(double mu_x, double mu_y, double sig_x, double sig_y,
 	double x_obs, double y_obs) {
 	// calculate normalization term
 	double gauss_norm;
@@ -119,7 +119,7 @@ double multiv_prob(double mu_x, double mu_y, double sig_x, double sig_y,
 	return weight;
 }
 
-double multiv_prob_vector(vector<LandmarkObs> obs_map_coord, const Map &map_landmarks, vector<int> nearest_landmarks_ids, double std_landmark[]) {
+inline double multiv_prob_vector(vector<LandmarkObs> obs_map_coord, const Map &map_landmarks, vector<int> nearest_landmarks_ids, double std_landmark[]) {
 	size_t size_type = nearest_landmarks_ids.size();
 	double particle_likelihood = 1.0;
 	for (int i = 0; i < size_type; i++) {
