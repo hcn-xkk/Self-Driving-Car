@@ -182,11 +182,11 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			nearest_landmarks_ids, std_landmark);
 		weights[j] = particles[j].weight;
 
+		particles[j].associations.clear();
+		particles[j].sense_x.clear();
+		particles[j].sense_y.clear();
 		for (int i = 0; i < nearest_landmarks_ids.size(); i++) {
 			int ind = nearest_landmarks_ids[i];
-			particles[j].associations.clear();
-			particles[j].sense_x.clear();
-			particles[j].sense_y.clear();
 			particles[j].associations.push_back(map_landmarks.landmark_list[ind].id_i);
 			particles[j].sense_x.push_back(map_landmarks.landmark_list[ind].x_f);
 			particles[j].sense_y.push_back(map_landmarks.landmark_list[ind].y_f);
