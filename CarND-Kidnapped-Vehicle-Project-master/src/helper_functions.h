@@ -15,6 +15,7 @@
 #include <string>
 #include <vector>
 #include "map.h"
+#include "multiv_gauss.h"
 
 // for portability of M_PI (Vis Studio, MinGW, etc.)
 #ifndef M_PI
@@ -47,6 +48,39 @@ struct LandmarkObs {
   double x;   // Local (vehicle coords) x position of landmark observation [m]
   double y;   // Local (vehicle coords) y position of landmark observation [m]
 };
+
+/**
+ * Compute observations in global coordinates.
+ * @param particle. 
+ * @param observations, vector of landmark observations.
+ * @output Euclidean distance between two 2D points
+ */
+vector<LandmarkObs> changeCoordinates(Particle particle, vector<LandmarkObs> observations) {
+	vector<LandmarkObs> obs_map_coord;
+	// transform to map coordinates
+	for (auto i = observations.begin(); i < observations.end(); i++) {
+		auto obs = observations[i];
+		obs_map_coord[i].x = particle.x + (cos(particle.theta) * obs.x) - (sin(particle.theta) * obs.y);
+		obs_map_coord[i].y = particle.y + (sin(particle.theta) * obs.x) + (cos(particle.theta) * obs.y);
+		obs_map_coord[i].id = obs.id;
+	}
+	return obs_map_coord;
+}
+
+
+double multiv_prob_vector(vector<LandmarkObs> obs_map_coord, const Map &map_landmarks, vector<int> nearest_landmarks_ids, double std_landmark[]) {
+	size_t size_type = nearest_landmarks_ids.size();
+	double particle_likelihood = 1.0;
+	for (int i = 0; i < size_type; i++) {
+		particle_likelihood *= multiv_prob(map_landmarks[nearest_landmarks_ids[i]].x, 
+			map_landmarks[nearest_landmarks_ids[i]].y, obs_map_coord[i].x, obs_map_coord[i].y, 
+			std_landmark[0], std_landmark[1]);
+	}
+	return particle_likelihood;
+
+}
+
+
 
 /**
  * Computes the Euclidean distance between two 2D points.
