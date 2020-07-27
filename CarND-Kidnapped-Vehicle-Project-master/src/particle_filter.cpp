@@ -12,6 +12,7 @@ using std::vector;
 
 static std::default_random_engine gen;
 
+
 void ParticleFilter::init(double x, double y, double theta, double std1[]) {
 	/**
 	 * TODO: Set the number of particles. Initialize all particles to
@@ -22,7 +23,6 @@ void ParticleFilter::init(double x, double y, double theta, double std1[]) {
 	 *   (and others in this file).
 	 */
 	num_particles = 100;  // TODO: Set the number of particles
-	// fill(weights.begin(), weights.end(), 1.0/ num_particles);   // initialize to even weights
 
 	// Create normal distribution for each state:
 	std::normal_distribution<double> pos_x(x, std1[0]);
@@ -45,11 +45,11 @@ void ParticleFilter::init(double x, double y, double theta, double std1[]) {
   // 	  particles[i].sense_x;
   // 	  particles[i].sense_y;
 	}
-
 	// Set state var initilzed.
 	is_initialized = true;
 
 }
+
 
 void ParticleFilter::prediction(double delta_t, double std_pos[],
 	double velocity, double yaw_rate) {
@@ -60,25 +60,14 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 	 *  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
 	 *  http://www.cplusplus.com/reference/random/default_random_engine/
 	 */
-	 /*
-	 # turn, and add randomness to the turning command
-	 orientation = self.orientation + float(turn) + random.gauss(0.0, self.turn_noise)
-	 orientation %= 2 * pi
-	 # move, and add randomness to the motion command
-	 dist = float(forward) + random.gauss(0.0, self.forward_noise)
-	 x = self.x + (cos(orientation) * dist)
-	 y = self.y + (sin(orientation) * dist)
-	 x %= world_size    # cyclic truncate
-	 y %= world_size
-	 */
 
-	 // std::default_random_engine gen;
+	// std::default_random_engine gen;
 	std::normal_distribution<double> x_distribution(0.0, std_pos[0]);
 	std::normal_distribution<double> y_distribution(0.0, std_pos[1]);
 	std::normal_distribution<double> theta_distribution(0.0, std_pos[2]);
 
 	for (int i = 0; i < num_particles; i++) {
-	// calculate new state
+		// calculate new state using the bicycle model
 		if (fabs(yaw_rate) < 0.00001) {
 			particles[i].x += velocity * delta_t * cos(particles[i].theta);
 			particles[i].y += velocity * delta_t * sin(particles[i].theta);
@@ -93,8 +82,6 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
 		particles[i].y += y_distribution(gen);
 		particles[i].theta += theta_distribution(gen);
 	}
-
-
 }
 
 
@@ -107,7 +94,6 @@ vector<int> ParticleFilter::selectNearbyLandmarksIndices(Particle particle, cons
 			nearby_landmarks_ids.push_back(i);
 		}
 	}
-
 	return nearby_landmarks_ids;
 
 }
@@ -137,7 +123,6 @@ vector<int> ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
 		int index_in_selected_indices = findMinElementIndex(dist_arr_i);
 		nearest_landmarks_ids[i] = selected_indices[index_in_selected_indices];
 	}
-
 	return nearest_landmarks_ids;
 
 }
@@ -161,7 +146,6 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 	 */
 
 	for (int j = 0; j < num_particles; j++) {
-
 		// Change observation to map coordinates 
 		vector<LandmarkObs> obs_map_coord_j = changeCoordinates(particles[j], observations);
 
@@ -185,10 +169,10 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			particles[j].sense_x.push_back(map_landmarks.landmark_list[ind].x_f);
 			particles[j].sense_y.push_back(map_landmarks.landmark_list[ind].y_f);
 		}
-
 	}
 
 }
+
 
 void ParticleFilter::resample() {
 	/**
@@ -213,6 +197,7 @@ void ParticleFilter::resample() {
 	particles = resampled_particles;
 }
 
+
 void ParticleFilter::SetAssociations(Particle& particle,
 	const vector<int>& associations,
 	const vector<double>& sense_x,
@@ -227,6 +212,7 @@ void ParticleFilter::SetAssociations(Particle& particle,
 	particle.sense_y = sense_y;
 }
 
+
 string ParticleFilter::getAssociations(Particle best) {
 	vector<int> v = best.associations;
 	std::stringstream ss;
@@ -235,6 +221,7 @@ string ParticleFilter::getAssociations(Particle best) {
 	s = s.substr(0, s.length() - 1);  // get rid of the trailing space
 	return s;
 }
+
 
 string ParticleFilter::getSenseCoord(Particle best, string coord) {
 	vector<double> v;
