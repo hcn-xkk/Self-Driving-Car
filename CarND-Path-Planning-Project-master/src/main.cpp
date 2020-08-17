@@ -159,7 +159,7 @@ int main() {
 					// Set acceleration / deceleration for generating future waypoints.
 					double speed_increment;
 					if (car_speed < 0.5 * ref_speed) {
-						speed_increment = ref_accel * (0.4*T);  // 
+						speed_increment = ref_accel * (0.5*T);  // 
 					}
 					else {
 						speed_increment = ref_accel * (0.2*T);  // 
@@ -232,7 +232,7 @@ int main() {
 					}
 
 					// Push the future points
-					double dist_inc = set_speed * T*0.5;
+					double dist_inc = ref_speed * T*0.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					//std::cout << "farthest_sd " << std::endl;
 					//printVector(farthest_sd);
