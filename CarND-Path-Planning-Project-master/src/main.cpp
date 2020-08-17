@@ -144,7 +144,7 @@ int main() {
 							check_speed = sqrt(pow(vx, 2) + pow(vy, 2));
 							double prev_check_car_s = sensor_fusion[i][5];
 							check_car_s = prev_check_car_s + dT * check_speed;
-							if (((check_car_s >= car_s) && (check_car_s < car_s + check_speed * T))) {
+							if (((check_car_s >= car_s) && (check_car_s < car_s + set_speed * T))) {
 								lane_is_ocupied = 1;
 							}
 						}
@@ -219,7 +219,7 @@ int main() {
 
 
 					}
-					double speed_increment = 25 * dT;
+					double speed_increment = 10 * dT;
 					double id_accel = 0;
 					if (b_too_close) {
 						set_speed = check_speed;
