@@ -131,7 +131,8 @@ int main() {
 					printVector(planned_lane_id_list);
 					std::cout << " planned_lane_s_list " << std::endl;
 					printVector(planned_lane_s_list[0]);
-
+					bool lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], lane_id2_s_list, sensor_fusion, max_s);
+					std::cout << " lane_is_ocupied " << lane_is_ocupied << std::endl;
 
 					// - Create x and y waypoints:
 					double new_car_s;
@@ -146,7 +147,7 @@ int main() {
 					double ref_y;
 					double ref_x;
 					
-					if (true && previous_length >= 2) {
+					if ((!lane_is_ocupied) && previous_length >= 2) {
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
