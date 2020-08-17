@@ -230,8 +230,8 @@ int main() {
 							id_accel = -1.0;
 						}
 						else {
-							ref_speed = std::min(set_speed, ref_speed + speed_increment);
-							id_accel = +1.0;
+							//ref_speed = std::min(set_speed, ref_speed + speed_increment);
+							id_accel = +0.0;
 						}
 					}
 					else {
@@ -240,8 +240,8 @@ int main() {
 							id_accel = +1.0;
 						}
 						else {
-							ref_speed = std::min(set_speed, ref_speed + speed_increment);
-							id_accel = 0.0;
+							ref_speed = std::min(set_speed, ref_speed - speed_increment);
+							id_accel = -1.0;
 						}
 					}
 					std::cout << "b_too_close " << (int)b_too_close << std::endl;
