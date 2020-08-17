@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES // M_PI
 #include <uWS/uWS.h>
 #include <fstream>
 #include <iostream>
@@ -9,11 +10,12 @@
 #include "json.hpp"
 #include "spline.h"
 
+
 // for convenience
 using nlohmann::json;
 using std::string;
 using std::vector;
-#define PI 3.14159265
+
 
 int main() {
 	uWS::Hub h;
@@ -29,9 +31,11 @@ int main() {
 	string map_file_ = "../data/highway_map.csv";
 	// The max s value before wrapping around the track back to 0
 	double max_s = 6945.554;
+	double lane_width = 4.0;
+	double yellow_line_d = 0.0;
 
 	std::cout << "here!" << std::endl;
-	auto output = SE2Transform({ 0.0,2.0 }, { 0.0,3.0 }, 1.0, 2.0, 0.25*PI);
+	auto output = SE2Transform({ 0.0,2.0 }, { 0.0,3.0 }, 1.0, 2.0, 0.25*M_PI);
 	printVector(output[0]);
 
 
@@ -58,7 +62,7 @@ int main() {
 	}
 
 	h.onMessage([&map_waypoints_x, &map_waypoints_y, &map_waypoints_s,
-		&map_waypoints_dx, &map_waypoints_dy]
+		&map_waypoints_dx, &map_waypoints_dy, &max_s, &yellow_line_d, &lane_width]
 		(uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
 			uWS::OpCode opCode) {
 		// "42" at the start of the message means there's a websocket message event.
@@ -93,7 +97,7 @@ int main() {
 
 					// Sensor Fusion Data, a list of all other cars on the same side 
 					//   of the road.
-					auto sensor_fusion = j[1]["sensor_fusion"];
+					auto sensor_fusion = j[1]["sensor_fusion"];  // vector<vector<double>>
 
 					json msgJson;
 
@@ -119,19 +123,40 @@ int main() {
 					else if (car_d < 8) { lane_id = 1; }
 					else { lane_id = 2; }
 
+					int previous_length = previous_path_x.size();
+
+
+					// Case1: If there is car within (T*set_speed) in current lane,
+					// create path with that car's speed as target speed.
+					// Case2: Otherwise, create path with set_speed as target speed.
+					// Region to check: [car_s, car_s + set_speed * T]
+					vector<int> planned_lane_id_list;
+					vector<vector<double>> planned_lane_s_list;
+					tie(planned_lane_id_list, planned_lane_s_list) = getRegionToTravel(end_path_s, end_path_d,
+						car_s, car_d, set_speed, (int)(T / dT), previous_length, max_s, yellow_line_d, lane_width);
+					// Find if there is preceiding car and update target speed if there is.
+
+					int behavior_mode;
+					vector<double> behavior_parameters;
+					tie(behavior_mode, behavior_parameters) = planBehaviorAndTraj(planned_lane_id_list, planned_lane_s_list,
+						sensor_fusion, T, dT, previous_length,
+						previous_path_x, previous_path_y, end_path_s, end_path_d, set_speed, max_s,
+						car_s, car_d, car_speed, yellow_line_d, lane_width);
+
 					// - Create x and y waypoints:
-					double new_car_s;
 					vector<double> new_car_x_waypoints;
 					vector<double> new_car_y_waypoints;
 					vector<double> new_car_t_waypoints;
-
-					// Push the previous_path_x,previous_path_y into waypoints:
-					// Including previous planned paths will help consistency.
-					int previous_length = previous_path_x.size();
 					double ref_yaw;
 					double ref_y;
 					double ref_x;
-					if (previous_length >= 2) {
+					std::cout << " ----------------------- " << std::endl;
+					if ((behavior_mode == 0 || behavior_mode == 2 || behavior_mode == 4)) {
+						for (int i = 0; i < previous_length; i++) {
+							next_x_vals.push_back(previous_path_x[i]);
+							next_y_vals.push_back(previous_path_y[i]);
+						}
+						// Push the current point
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
@@ -145,10 +170,21 @@ int main() {
 						new_car_y_waypoints.push_back(ref_y_prev);
 						new_car_y_waypoints.push_back(ref_y);
 
-						for (int i = 0; i < previous_length; i++) {
-							next_x_vals.push_back(previous_path_x[i]);
-							next_y_vals.push_back(previous_path_y[i]);
+						// Push the future points
+						double t1, ref_s_new, ref_d_new;
+						ref_d_new = yellow_line_d + lane_width * 0.5 + lane_width * (double)getLaneId(end_path_d, yellow_line_d, lane_width);
+						for (int i = 1; i <= 3; i++) {
+							t1 = previous_length * dT + dT + (double)i * (T - dT - previous_length * dT) / 3.0;
+							ref_s_new = calculatePolynomial(behavior_parameters, t1);
+
+							auto ref_xy_new = getXY(ref_s_new, ref_d_new, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+							new_car_x_waypoints.push_back(ref_xy_new[0]);
+							new_car_y_waypoints.push_back(ref_xy_new[1]);
 						}
+						std::cout << "new_car_x_waypoints is " << std::endl;
+						printVector(new_car_x_waypoints);
+						printVector(new_car_y_waypoints);
+
 
 					}
 					else {
@@ -172,22 +208,89 @@ int main() {
 						ref_x = car_x;
 						ref_y = car_y;
 
+						// Push the future points
+						double t1, ref_s_new, ref_d_new;
+						ref_d_new = yellow_line_d + lane_width * 0.5 + lane_width * (double)lane_id;
+						std::cout << "behavior_parameters" << behavior_parameters[0] << behavior_parameters[1]
+							<< behavior_parameters[2] << behavior_parameters[3] << behavior_parameters[4]
+							<< behavior_parameters[5] << std::endl;
+						previous_length = 0;
+						for (int i = 1; i <= 3; i++) {
+							t1 = previous_length * dT + dT + (double)i * (T - dT - previous_length * dT) / 3.0;
+							ref_s_new = calculatePolynomial(behavior_parameters, t1);
 
+							auto ref_xy_new = getXY(ref_s_new, ref_d_new, map_waypoints_s, map_waypoints_x, map_waypoints_y);
+							new_car_x_waypoints.push_back(ref_xy_new[0]);
+							new_car_y_waypoints.push_back(ref_xy_new[1]);
+						}
 					}
 
-					// Push the future points
-					double dist_inc = 30.0; // set_speed * T / 3.0;
-					for (int i = 1; i <= 3; i++) {
-						//
-						vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
-						new_car_s = farthest_sd[0] + dist_inc * i;
-						vector<double> new_car_xy = getXY(new_car_s, 2.0 + (double)lane_id*4.0,
-							map_waypoints_s, map_waypoints_x, map_waypoints_y);
-						new_car_x_waypoints.push_back(new_car_xy[0]);
-						new_car_y_waypoints.push_back(new_car_xy[1]);
-					}
 
-					// Transform into car coordinates. 
+
+
+
+
+
+
+
+					//// Push the previous_path_x,previous_path_y into waypoints:
+					//// Including previous planned paths will help consistency.
+					//double ref_yaw;
+					//double ref_y;
+					//double ref_x;
+					//if (previous_length >= 2) {
+					//	std::cout << "Get to the if" << std::endl;
+					//	ref_y = previous_path_y[previous_length - 1];
+					//	double ref_y_prev = previous_path_y[previous_length - 2];
+					//	ref_x = previous_path_x[previous_length - 1];
+					//	double ref_x_prev = previous_path_x[previous_length - 2];
+					//	std::cout << ref_x << ' ' << ref_x_prev << std::endl;
+
+					//	ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
+					//	new_car_x_waypoints.push_back(ref_x_prev);
+					//	new_car_x_waypoints.push_back(ref_x);
+					//	new_car_y_waypoints.push_back(ref_y_prev);
+					//	new_car_y_waypoints.push_back(ref_y);
+
+					//	for (int i = 0; i < previous_length; i++) {
+					//		next_x_vals.push_back(previous_path_x[i]);
+					//		next_y_vals.push_back(previous_path_y[i]);
+					//	}
+					//}
+					//else {
+					//	std::cout << "Get to the else" << std::endl;
+					//	ref_yaw = car_yaw;
+					//	// Going one step backwards
+					//	if (car_speed > 0) {
+					//		new_car_x_waypoints.push_back(car_x - car_speed * dT * cos(car_yaw));
+					//		new_car_y_waypoints.push_back(car_y - car_speed * dT * sin(car_yaw));
+					//		// Push the current point
+					//		new_car_x_waypoints.push_back(car_x);
+					//		new_car_y_waypoints.push_back(car_y);
+					//	}
+					//	else {
+					//		new_car_x_waypoints.push_back(car_x - 1 * dT * cos(car_yaw));
+					//		new_car_y_waypoints.push_back(car_y - 1 * dT * sin(car_yaw));
+					//		// Push the current point
+					//		new_car_x_waypoints.push_back(car_x);
+					//		new_car_y_waypoints.push_back(car_y);
+					//	}
+					//	ref_x = car_x;
+					//	ref_y = car_y;
+					//}
+
+					//// Push the future points
+					//double dist_inc = set_speed * T / 3.0;
+					//vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
+					//double ref_s = farthest_sd[0];
+					//for (int i = 1; i <= 3; i++) {
+					//	vector<double> new_car_xy = getXY(ref_s + dist_inc * i, 2.0 + (double)lane_id*4.0,
+					//		map_waypoints_s, map_waypoints_x, map_waypoints_y);
+					//	new_car_x_waypoints.push_back(new_car_xy[0]);
+					//	new_car_y_waypoints.push_back(new_car_xy[1]);
+					//}
+
+					// Transform into local coordinates at ref_x,ref_y,ref_raw. 
 					auto new_car_carxy_waypoints = GlobalToCarTransform(new_car_x_waypoints,
 						new_car_y_waypoints, ref_x, ref_y, ref_yaw);
 					std::cout << "This is printing new_car_carxy_waypoints[0] : " << std::endl;
@@ -212,14 +315,14 @@ int main() {
 						next_x_vals.push_back(new_xy_global[0]);
 						next_y_vals.push_back(new_xy_global[1]);
 					}
+
+
+
+
 					std::cout << "This is printing next_x_vals : " << std::endl;
 					printVector(next_x_vals);
 					std::cout << "This is printing next_y_vals : " << std::endl;
 					printVector(next_y_vals);
-
-
-
-
 
 					msgJson["next_x"] = next_x_vals;
 					msgJson["next_y"] = next_y_vals;
