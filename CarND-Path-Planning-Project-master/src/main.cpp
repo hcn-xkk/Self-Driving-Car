@@ -204,11 +204,11 @@ int main() {
 					}
 
 					if (b_too_close) {
-						ref_speed -= 5 * dT; // using -5m/s^2 accel
+						ref_speed -= 10 * dT; // using -5m/s^2 accel
 					}
 					else {
 						if (ref_speed < set_speed) {
-							ref_speed += 5 * dT; // using 5m/s^2 accel
+							ref_speed += 10 * dT; // using 5m/s^2 accel
 						}
 						else {
 							ref_speed = set_speed;
