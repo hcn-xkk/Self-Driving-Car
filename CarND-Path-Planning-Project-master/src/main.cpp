@@ -210,7 +210,11 @@ int main() {
 						if (ref_speed < set_speed) {
 							ref_speed += 5 * dT; // using 5m/s^2 accel
 						}
+						else {
+							ref_speed = set_speed;
+						}
 					}
+					std::cout << "ref_speed " << ref_speed << std::endl;
 					// Push the future points
 					double dist_inc = set_speed * T*0.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
@@ -218,15 +222,15 @@ int main() {
 					printVector(farthest_sd);
 					std::cout << "car_s " << car_s << std::endl;
 					std::cout << "car_d " << car_d << std::endl;
-
+					std::cout << "car_x " << car_x << std::endl;
+					std::cout << "car_Y " << car_y << std::endl;
+					std::cout << "car_yaw " << car_yaw << std::endl;  
+					std::cout << "ref_yaw " << ref_yaw << std::endl;
 					for (int i = 1; i <= 3; i++) {
 						new_car_s = farthest_sd[0] + dist_inc * i;
 						vector<double> new_car_xy = getXY(new_car_s, 2.0 + (double)lane_id*4.0,
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
-						std::cout << "car_x " << car_x << std::endl;
-						std::cout << "car_Y " << car_y << std::endl;
-						std::cout << "car_yaw " << car_yaw << std::endl;  
-						std::cout << "ref_yaw " << ref_yaw << std::endl;
+						
 						// TODO: car_yaw not accurately measured. Need a filter. 
 						std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
 						std::cout << "new_car_xy " << new_car_xy[1] << std::endl;
