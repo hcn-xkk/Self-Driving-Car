@@ -175,8 +175,7 @@ int main() {
 							if (lane_id == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {
 								check_speed = sqrt(pow(sensor_fusion[i][3], 2) + pow(sensor_fusion[i][4], 2));
 								check_car_s = sensor_fusion[i][5] + dT * check_speed;
-								if (((sensor_fusion[i][5] >= car_s) && (sensor_fusion[i][5] < car_s + set_speed*T)) || 
-									((sensor_fusion[i][5] + max_s >= car_s) && (sensor_fusion[i][5] + max_s < car_s + set_speed * T))) {
+								if (((sensor_fusion[i][5] >= car_s) && (sensor_fusion[i][5] < car_s + set_speed*T)) ) {
 									b_too_close = true;
 								}
 							}
