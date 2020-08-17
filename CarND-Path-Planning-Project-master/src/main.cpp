@@ -202,7 +202,18 @@ int main() {
 								}
 							}
 						}
+						std::cout << "Get to the else IF" << std::endl;
+						// Going one step backwards
 
+						new_car_x_waypoints.push_back(car_x - 1 * cos(car_yaw));
+						new_car_y_waypoints.push_back(car_y - 1 * sin(car_yaw));
+						// Push the current point
+						new_car_x_waypoints.push_back(car_x);
+						new_car_y_waypoints.push_back(car_y);
+
+						ref_x = car_x;
+						ref_y = car_y;
+						ref_yaw = car_yaw;
 					}
 					else {
 						std::cout << "Get to the else" << std::endl;
@@ -225,25 +236,19 @@ int main() {
 					double id_accel = 0.0;
 					if (b_too_close) {
 						set_speed = check_speed;
-						if (ref_speed > set_speed) {
-							ref_speed -= speed_increment; // using -5m/s^2 accel
-							id_accel = -1.0;
-						}
-						else {
-							//ref_speed = std::min(set_speed, ref_speed + speed_increment);
-							id_accel = +0.0;
-						}
+					}
+					if (ref_speed > set_speed + 5.0*speed_increment) {
+						ref_speed -= speed_increment; // using -5m/s^2 accel
+						id_accel = (set_speed - ref_speed) / 10.0;
+					}
+					else if (ref_speed < set_speed - 5.0*speed_increment) {
+						ref_speed += speed_increment; // using -5m/s^2 accel
+						id_accel = +(set_speed - ref_speed) / 10.0;
 					}
 					else {
-						if (ref_speed < set_speed) {
-							ref_speed += speed_increment; // using 5m/s^2 accel
-							id_accel = +1.0;
-						}
-						else {
-							ref_speed = std::min(set_speed, ref_speed - speed_increment);
-							id_accel = -1.0;
-						}
+						id_accel = +0.0;
 					}
+					
 					std::cout << "b_too_close " << (int)b_too_close << std::endl;
 					std::cout << "check_speed " << check_speed << std::endl;
 					std::cout << "set_speed " << set_speed << std::endl;
