@@ -101,28 +101,28 @@ int main() {
 
 					vector<double> next_x_vals;
 					vector<double> next_y_vals;
-					std::cout << " ----------------------- " << std::endl;
+					
 					/**
 					 * TODO: define a path made up of (x,y) points that the car will visit
 					 *   sequentially every .02 seconds
 					 */
 					 // Try 3 : The last path needs to be smoothened. 
-
-					 // - Use Frenet coord to select a few waypoints,
-					 // then use assume constant speed along lane
-					double dT = 0.02;   // delta for the sent out trajectories
-					double T = 1.0;     // Time span of the sent trajectory
-					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
-					double ref_speed = std::max(0.0, car_speed * 0.44);
 					
-					/* ---------- Create x and y waypoints ---------- */
-					// - Find current lane_id:
-					// lane width 4, double yellow lane d=0
-					int lane_id = getLaneId(car_d, yellow_line_d, lane_width);
-					/*if (car_d < 4) { lane_id = 0; }
-					else if (car_d < 8) { lane_id = 1; }
-					else { lane_id = 2; }*/
+					/** 
+					------------------------------------------------------------------------
+					Section
+					Create x and y waypoints
+					------------------------------------------------------------------------
+					*/
+					double dt = 0.02;   // delta for the sent out trajectories
+					double t = 1.0;     // time span of the sent trajectory
+					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50mph
+					double ref_speed = std::max(0.0, car_speed * 0.44);
 
+					// - Find current lane_id:
+					int lane_id = getLaneId(car_d, yellow_line_d, lane_width);
+					
+					// - Find length of previous path:
 					int previous_length = previous_path_x.size();
 					//// Region to check: [car_s, car_s + set_speed * T]
 					//vector<int> planned_lane_id_list;
@@ -134,11 +134,11 @@ int main() {
 					//std::cout << " planned_lane_s_list " << std::endl;
 					//printVector(planned_lane_s_list[0]);
 
-					/*int lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], planned_lane_s_list, sensor_fusion, max_s, yellow_line_d, lane_width);
-					*/
+					// - Find whether there is preceding vehicle, set set_speed, accel/decel:
 					bool lane_is_ocupied = false;
 					double check_car_s;
 					check_car_s = car_s + set_speed * T;
+					
 					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
 					lane_is_ocupied = findPredecessorInSegment(lane_id, 
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
@@ -149,11 +149,41 @@ int main() {
 							previous_length = previous_length / 2;
 						}
 					}
-					
+					/*int lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], planned_lane_s_list, sensor_fusion, max_s, yellow_line_d, lane_width);
+					*/
 					std::cout << "set_speed after checking predecessor  " << set_speed << std::endl;
 
-					/* ---------- Create x and y waypoints ---------- */
-					// - Declare x and y waypoints:
+					// Set acceleration / deceleration for generating future waypoints.
+					double set_accel = 2.5;
+
+					double speed_increment = set_accel * (0.5*T);  // 
+					double k_accel;
+					if (ref_speed > set_speed + speed_increment) {
+						ref_speed -= speed_increment; // using -5m/s^2 accel
+						k_accel = -1.0;
+						if (check_car_s - car_s < ref_speed * T) {
+							k_accel -= 0.5 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
+						}
+					}
+					else if (ref_speed < set_speed - speed_increment) {
+						ref_speed += speed_increment; // using -5m/s^2 accel
+						k_accel = 1.0;
+					}
+					else {
+						ref_speed = set_speed;
+						k_accel = +0.0;
+						if (check_car_s - car_s < ref_speed * T) {
+							k_accel -= 0.5 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
+						}
+					}
+					set_accel *= k_accel;   // update set_accel for generating future waypoints.
+
+					std::cout << "lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
+					std::cout << "set_speed " << set_speed << std::endl;
+					std::cout << "ref_speed " << ref_speed << std::endl;
+
+
+					// - Create x and y waypoints:
 					vector<double> new_car_x_waypoints;
 					vector<double> new_car_y_waypoints;
 
@@ -195,34 +225,6 @@ int main() {
 						new_car_y_waypoints.push_back(car_y);
 					}
 
-					double set_accel = 2.5;
-					double speed_increment = set_accel * (0.5*T);
-
-					double id_accel = 0.0;
-					
-					if (ref_speed > set_speed + speed_increment) {
-						ref_speed -= speed_increment; // using -5m/s^2 accel
-						id_accel = -1.0;
-						if (check_car_s - car_s < ref_speed * T) {
-							id_accel -= 0.5 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
-						}
-						
-					}
-					else if (ref_speed < set_speed - speed_increment) {
-						ref_speed += speed_increment; // using -5m/s^2 accel
-						id_accel = 1.0;
-					}
-					else {
-						ref_speed = set_speed;
-						id_accel = +0.0;
-						if (check_car_s - car_s < ref_speed * T) {
-							id_accel -= 0.5 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
-						}
-					}
-
-					std::cout << "lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
-					std::cout << "set_speed " << set_speed << std::endl;
-					std::cout << "ref_speed " << ref_speed << std::endl;
 					// Push the future points
 					double dist_inc = set_speed * T*0.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
@@ -273,7 +275,7 @@ int main() {
 						next_x_vals.push_back(new_xy_global[0]);
 						next_y_vals.push_back(new_xy_global[1]);
 						if (fabs(ref_speed - set_speed) > set_accel * dT) {
-							ref_speed += id_accel * set_accel * dT;
+							ref_speed += set_accel * dT;
 						}
 						delta_x_car += ref_speed * dT;
 						//delta_x_car += std::min(set_speed, (ref_speed + id_accel * speed_increment * i)) * dT;
