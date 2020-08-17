@@ -147,7 +147,7 @@ int main() {
 					double ref_y;
 					double ref_x;
 					
-					if ((lane_is_ocupied==0) && previous_length >= 2) {
+					if (false && (lane_is_ocupied==0) && previous_length >= 2) {
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
@@ -170,20 +170,13 @@ int main() {
 					else {
 						std::cout << "Get to the else" << std::endl;
 						// Going one step backwards
-						if (false) {
-							new_car_x_waypoints.push_back(car_x - car_speed * dT * cos(car_yaw));
-							new_car_y_waypoints.push_back(car_y - car_speed * dT * sin(car_yaw));
-							// Push the current point
-							new_car_x_waypoints.push_back(car_x);
-							new_car_y_waypoints.push_back(car_y);
-						}
-						else {
-							new_car_x_waypoints.push_back(car_x - 1 * cos(car_yaw));
-							new_car_y_waypoints.push_back(car_y - 1 * sin(car_yaw));
-							// Push the current point
-							new_car_x_waypoints.push_back(car_x);
-							new_car_y_waypoints.push_back(car_y);
-						}
+						
+						new_car_x_waypoints.push_back(car_x - 1 * cos(car_yaw));
+						new_car_y_waypoints.push_back(car_y - 1 * sin(car_yaw));
+						// Push the current point
+						new_car_x_waypoints.push_back(car_x);
+						new_car_y_waypoints.push_back(car_y);
+						
 						ref_x = car_x;
 						ref_y = car_y;
 						ref_yaw = car_yaw;
