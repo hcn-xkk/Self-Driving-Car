@@ -147,7 +147,7 @@ int main() {
 					double ref_y;
 					double ref_x;
 					
-					if ((lane_is_ocupied==1) && previous_length >= 2) {
+					if ((lane_is_ocupied==0) && previous_length >= 2) {
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
