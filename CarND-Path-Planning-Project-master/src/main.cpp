@@ -29,6 +29,8 @@ int main() {
 	string map_file_ = "../data/highway_map.csv";
 	// The max s value before wrapping around the track back to 0
 	double max_s = 6945.554;
+	double lane_width = 4.0;
+	double yellow_line_d = 0.0;
 
 	std::cout << "here!" << std::endl;
 	auto output = SE2Transform({ 0.0,2.0 }, { 0.0,3.0 }, 1.0, 2.0, 0.25*PI);
@@ -58,7 +60,7 @@ int main() {
 	}
 
 	h.onMessage([&map_waypoints_x, &map_waypoints_y, &map_waypoints_s,
-		&map_waypoints_dx, &map_waypoints_dy]
+		&map_waypoints_dx, &map_waypoints_dy, &max_s, &yellow_line_d, &lane_width]
 		(uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
 			uWS::OpCode opCode) {
 		// "42" at the start of the message means there's a websocket message event.
@@ -99,7 +101,7 @@ int main() {
 
 					vector<double> next_x_vals;
 					vector<double> next_y_vals;
-
+					std::cout << " ----------------------- " << std::endl;
 					/**
 					 * TODO: define a path made up of (x,y) points that the car will visit
 					 *   sequentially every .02 seconds
@@ -119,6 +121,18 @@ int main() {
 					else if (car_d < 8) { lane_id = 1; }
 					else { lane_id = 2; }
 
+					int previous_length = previous_path_x.size();
+					// Region to check: [car_s, car_s + set_speed * T]
+					vector<int> planned_lane_id_list;
+					vector<vector<double>> planned_lane_s_list;
+					tie(planned_lane_id_list, planned_lane_s_list) = getRegionToTravel(end_path_s, end_path_d,
+						car_s, car_d, set_speed, (int)(T / dT), previous_length, max_s, yellow_line_d, lane_width);
+					std::cout << " planned_lane_id_list " << std::endl;
+					printVector(planned_lane_id_list);
+					std::cout << " planned_lane_s_list " << std::endl;
+					printVector(planned_lane_s_list);
+
+
 					// - Create x and y waypoints:
 					double new_car_s;
 					vector<double> new_car_x_waypoints;
@@ -127,11 +141,12 @@ int main() {
 
 					// Push the previous_path_x,previous_path_y into waypoints:
 					// Including previous planned paths will help consistency.
-					int previous_length = previous_path_x.size();
+					
 					double ref_yaw;
 					double ref_y;
 					double ref_x;
-					if (previous_length >= 2) {
+					
+					if (false && previous_length >= 2) {
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
