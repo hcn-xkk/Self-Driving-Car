@@ -221,27 +221,27 @@ int main() {
 
 
 					}
-					double speed_increment = 5 * dT;
-					double id_accel = 0;
+					double speed_increment = 5.0 * dT;
+					double id_accel = 0.0;
 					if (b_too_close) {
 						set_speed = check_speed;
 						if (ref_speed > set_speed) {
 							ref_speed -= speed_increment; // using -5m/s^2 accel
-							id_accel = -1;
+							id_accel = -1.0;
 						}
 						else {
 							ref_speed = std::min(set_speed, ref_speed + speed_increment);
-							id_accel = +1;
+							id_accel = +1.0;
 						}
 					}
 					else {
 						if (ref_speed < set_speed) {
 							ref_speed += speed_increment; // using 5m/s^2 accel
-							id_accel = +1;
+							id_accel = +1.0;
 						}
 						else {
 							ref_speed = std::min(set_speed, ref_speed + speed_increment);
-							id_accel = 0;
+							id_accel = 0.0;
 						}
 					}
 					std::cout << "b_too_close " << (int)b_too_close << std::endl;
