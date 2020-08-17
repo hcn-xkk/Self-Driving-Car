@@ -117,7 +117,10 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50mph
+					// ref_speed, ref_accel are used to generate new waypoints.
+					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * 0.44);
+					double ref_accel = 5;
 
 					// - Find current lane_id:
 					int lane_id = getLaneId(car_d, yellow_line_d, lane_width);
@@ -154,9 +157,7 @@ int main() {
 					std::cout << "set_speed after checking predecessor  " << set_speed << std::endl;
 
 					// Set acceleration / deceleration for generating future waypoints.
-					double set_accel = 5;
-
-					double speed_increment = set_accel * (0.2*T);  // 
+					double speed_increment = ref_accel * (0.2*T);  // 
 					double k_accel;
 					if (ref_speed > set_speed + speed_increment) {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
@@ -176,7 +177,7 @@ int main() {
 							k_accel -= 0.5 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
 						}
 					}
-					set_accel *= k_accel;   // update set_accel for generating future waypoints.
+					ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
 
 					std::cout << "lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
 					std::cout << "set_speed " << set_speed << std::endl;
@@ -220,7 +221,6 @@ int main() {
 
 						new_car_x_waypoints.push_back(car_x - 1 * cos(car_yaw));
 						new_car_y_waypoints.push_back(car_y - 1 * sin(car_yaw));
-						// Push the current point
 						new_car_x_waypoints.push_back(car_x);
 						new_car_y_waypoints.push_back(car_y);
 					}
@@ -229,20 +229,19 @@ int main() {
 					double dist_inc = set_speed * T*0.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					//std::cout << "farthest_sd " << std::endl;
-					printVector(farthest_sd);
+					//printVector(farthest_sd);
 					/*std::cout << "car_s " << car_s << std::endl;
 					std::cout << "car_d " << car_d << std::endl;
 					std::cout << "car_x " << car_x << std::endl;
-					std::cout << "car_Y " << car_y << std::endl;*/
+					std::cout << "car_Y " << car_y << std::endl;
 					std::cout << "car_speed " << car_speed * 0.44 << std::endl;
-					/*std::cout << "car_yaw " << car_yaw << std::endl;  
+					std::cout << "car_yaw " << car_yaw << std::endl;  
 					std::cout << "ref_yaw " << ref_yaw << std::endl;*/
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * i;
 						vector<double> new_car_xy = getXY(new_car_s, 2.0 + (double)lane_id*4.0,
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
-						
 						// TODO: car_yaw not accurately measured. Need a filter. 
 						/*std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
 						std::cout << "new_car_xy " << new_car_xy[1] << std::endl;*/
@@ -250,6 +249,7 @@ int main() {
 						new_car_y_waypoints.push_back(new_car_xy[1]);
 					}
 
+					// Interpolate waypoints to generate reference trace:
 					// Transform into car coordinates. 
 					auto new_car_carxy_waypoints = GlobalToCarTransform(new_car_x_waypoints,
 						new_car_y_waypoints, ref_x, ref_y, ref_yaw);
@@ -274,8 +274,8 @@ int main() {
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
 						next_y_vals.push_back(new_xy_global[1]);
-						if (fabs(ref_speed - set_speed) > set_accel * dT) {
-							ref_speed += set_accel * dT;
+						if (fabs(ref_speed - set_speed) > fabs(ref_accel) * dT) {
+							ref_speed += ref_accel * dT;
 						}
 						delta_x_car += ref_speed * dT;
 						//delta_x_car += std::min(set_speed, (ref_speed + id_accel * speed_increment * i)) * dT;
