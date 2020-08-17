@@ -156,7 +156,7 @@ int main() {
 					// Set acceleration / deceleration for generating future waypoints.
 					double set_accel = 5;
 
-					double speed_increment = set_accel * (0.5*T);  // 
+					double speed_increment = set_accel * (0.2*T);  // 
 					double k_accel;
 					if (ref_speed > set_speed + speed_increment) {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
