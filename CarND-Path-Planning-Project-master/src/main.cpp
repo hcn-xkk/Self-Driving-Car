@@ -113,7 +113,8 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // Time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
-
+					double ref_speed = set_speed;
+					bool b_too_close = false;
 					// - Find current lane_id:
 					// lane width 4, double yellow lane d=0
 					int lane_id;
@@ -167,6 +168,21 @@ int main() {
 						}
 
 					}
+					else if (lane_is_ocupied == 1) {
+						double check_speed, check_car_s;
+						// look for preceding vehicle and track
+						for (int i = 0; i < sensor_fusion.size(); i++) {
+							if (lane_id == sensor_fusion[i][6]) {
+								check_speed = sqrt(pow(sensor_fusion[i][3], 2) + pow(sensor_fusion[i][4], 2));
+								check_car_s = sensor_fusion[i][5] + dT * check_speed;
+								if (((sensor_fusion[i][5] >= car_s) && (sensor_fusion[i][5] < car_s + set_speed*T)) || 
+									((sensor_fusion[i][5] + max_map_s >= s_start) && (sensor_fusion[i][5] + max_map_s < s_end))) {
+									b_too_close = true;
+								}
+							}
+						}
+
+					}
 					else {
 						std::cout << "Get to the else" << std::endl;
 						// Going one step backwards
@@ -180,10 +196,19 @@ int main() {
 						ref_x = car_x;
 						ref_y = car_y;
 						ref_yaw = car_yaw;
+						//ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
 
 
 					}
 
+					if (b_too_close) {
+						ref_speed -= 5 * dT; // using -5m/s^2 accel
+					}
+					else {
+						if (ref_speed < set_speed) {
+							ref_speed += 5 * dT; // using 5m/s^2 accel
+						}
+					}
 					// Push the future points
 					double dist_inc = set_speed * T*0.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
@@ -221,7 +246,7 @@ int main() {
 					double new_x_car;
 					double new_y_car;
 					vector<double> new_xy_global;
-					double delta_x_car = set_speed * dT;   // Assuming car_yaw does not change much in one horizon
+					double delta_x_car = ref_speed * dT;   // Assuming car_yaw does not change much in one horizon
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
 					int l = next_x_vals.size();
 					for (int i = 1; i <= T / dT - l; i++) {
