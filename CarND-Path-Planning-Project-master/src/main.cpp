@@ -130,7 +130,7 @@ int main() {
 					std::cout << " planned_lane_id_list " << std::endl;
 					printVector(planned_lane_id_list);
 					std::cout << " planned_lane_s_list " << std::endl;
-					printVector(planned_lane_s_list);
+					printVector(planned_lane_s_list[0]);
 
 
 					// - Create x and y waypoints:
