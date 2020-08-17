@@ -232,29 +232,27 @@ int main() {
 
 
 					}
-					double speed_increment = 15.0 * dT;
+					double speed_increment = 5.0 * T;
 					double id_accel = 0.0;
-					//if (b_too_close) {
-					//	set_speed = check_speed;
-					//}
-					//if (ref_speed > set_speed + 5.0*speed_increment) {
-					//	ref_speed -= speed_increment; // using -5m/s^2 accel
-					//	id_accel = (set_speed - ref_speed) / 10.0;
-					//}
-					//else if (ref_speed < set_speed - 5.0*speed_increment) {
-					//	ref_speed += speed_increment; // using -5m/s^2 accel
-					//	id_accel = +(set_speed - ref_speed) / 10.0;
-					//}
-					//else {
-					//	id_accel = +0.0;
-					//}
 					if (b_too_close) {
+						set_speed = check_speed;
+					}
+					if (ref_speed > set_speed + speed_increment) {
+						ref_speed -= speed_increment; // using -5m/s^2 accel
+					}
+					else if (ref_speed < set_speed - 5.0*speed_increment) {
+						ref_speed += speed_increment; // using -5m/s^2 accel
+					}
+					else {
+						//id_accel = +0.0;
+					}
+					/*if (b_too_close) {
 						set_speed = check_speed;
 						ref_speed = 10;
 					}
 					else {
 						ref_speed = set_speed;
-					}
+					}*/
 
 					std::cout << "b_too_close " << (int)b_too_close << std::endl;
 					std::cout << "check_speed " << check_speed << std::endl;
