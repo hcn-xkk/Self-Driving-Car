@@ -147,7 +147,8 @@ int main() {
 					double ref_yaw;
 					double ref_y;
 					double ref_x;
-					
+					double check_speed, check_car_s;
+
 					if (true && (lane_is_ocupied==0) && previous_length >= 2) {
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
@@ -166,10 +167,11 @@ int main() {
 							next_x_vals.push_back(previous_path_x[i]);
 							next_y_vals.push_back(previous_path_y[i]);
 						}
+						check_speed = set_speed; 
+						check_car_s = car_s + set_speed * T;
 
 					}
 					else if (lane_is_ocupied == 1 && previous_length >= 2) {
-						double check_speed, check_car_s;
 						// look for preceding vehicle and track
 						for (int i = 0; i < sensor_fusion.size(); i++) {
 							if (lane_id == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {
@@ -178,7 +180,7 @@ int main() {
 								check_speed = sqrt(pow(vx, 2) + pow(vy, 2));
 								double prev_check_car_s = sensor_fusion[i][5];
 								check_car_s = prev_check_car_s + dT * check_speed;
-								if (((check_car_s >= car_s) && (check_car_s < car_s + set_speed*T)) ) {
+								if (((check_car_s >= car_s) && (check_car_s < car_s + check_speed*T)) ) {
 									b_too_close = true;
 								}
 							}
@@ -202,13 +204,18 @@ int main() {
 
 
 					}
-
+					double speed_increment = 25 * dT;
 					if (b_too_close) {
-						ref_speed -= 10 * dT; // using -5m/s^2 accel
+						if (ref_speed > check_speed) {
+							ref_speed -= speed_increment; // using -5m/s^2 accel
+						}
+						else {
+							ref_speed = std::min(check_speed, ref_speed + speed_increment);
+						}
 					}
 					else {
 						if (ref_speed < set_speed) {
-							ref_speed += 10 * dT; // using 5m/s^2 accel
+							ref_speed += speed_increment; // using 5m/s^2 accel
 						}
 						else {
 							ref_speed = set_speed;
