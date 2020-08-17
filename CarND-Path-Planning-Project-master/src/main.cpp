@@ -198,6 +198,7 @@ int main() {
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						std::cout << "car_x " << car_x << std::endl;
 						std::cout << "car_Y " << car_y << std::endl;
+						std::cout << "car_yaw " << car_yaw << std::endl;
 						std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
 						std::cout << "new_car_xy " << new_car_xy[1] << std::endl;
 						new_car_x_waypoints.push_back(new_car_xy[0]);
