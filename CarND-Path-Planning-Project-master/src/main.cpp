@@ -200,9 +200,11 @@ int main() {
 						new_car_x_waypoints.push_back(car_x);
 						new_car_y_waypoints.push_back(car_y);
 
-						ref_x = car_x;
-						ref_y = car_y;
-						ref_yaw = car_yaw;
+						ref_y = previous_path_y[previous_length - 1];
+						double ref_y_prev = previous_path_y[previous_length - 2];
+						ref_x = previous_path_x[previous_length - 1];
+						double ref_x_prev = previous_path_x[previous_length - 2];
+						ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
 					}
 					else {
 						std::cout << "Get to the else" << std::endl;
