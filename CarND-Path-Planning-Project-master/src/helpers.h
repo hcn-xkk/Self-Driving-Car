@@ -224,7 +224,9 @@ void printVector(vector<int> v) {
 }
 
 
-int checkLaneEmpty(int lane_id, vector<vector<double>> lane_id_s_list, vector<vector<double>> sensor_fusion, double max_map_s) {
+int checkLaneEmpty(int lane_id, vector<vector<double>> lane_id_s_list, 
+	vector<vector<double>> sensor_fusion, double max_map_s, 
+	double yellow_line_d, double lane_width) {
 	int output = 0;
 
 	for (int j = 0; j < lane_id_s_list.size(); j++) {
@@ -232,7 +234,7 @@ int checkLaneEmpty(int lane_id, vector<vector<double>> lane_id_s_list, vector<ve
 		double s_end = lane_id_s_list[j][1];
 
 		for (int i = 0; i < sensor_fusion.size(); i++) {
-			if (lane_id == sensor_fusion[i][6]) {
+			if (lane_id == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {
 				if ((sensor_fusion[i][5] >= s_start) && (sensor_fusion[i][5] < s_end)) {
 					output += 1;
 					return output;
@@ -390,8 +392,8 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 					lane_id2_s_list.push_back(planned_lane_s_list[i]);
 				}
 			}
-			behavior_mode = 2 + std::max(checkLaneEmpty(lane_id1, lane_id1_s_list, sensor_fusion, max_map_s),
-				checkLaneEmpty(lane_id2, lane_id2_s_list, sensor_fusion, max_map_s));
+			behavior_mode = 2 + std::max(checkLaneEmpty(lane_id1, lane_id1_s_list, sensor_fusion, max_map_s, yellow_lane_d, lane_width),
+				checkLaneEmpty(lane_id2, lane_id2_s_list, sensor_fusion, max_map_s, yellow_lane_d, lane_width));
 		}
 		else { // mode 4 or 5
 			int lane_id1 = *planned_lane_id_list.begin();
@@ -405,8 +407,8 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 					lane_id2_s_list.push_back(planned_lane_s_list[i]);
 				}
 			}
-			behavior_mode = 4 + std::max(checkLaneEmpty(lane_id1, lane_id1_s_list, sensor_fusion, max_map_s),
-				checkLaneEmpty(lane_id2, lane_id2_s_list, sensor_fusion, max_map_s));
+			behavior_mode = 4 + std::max(checkLaneEmpty(lane_id1, lane_id1_s_list, sensor_fusion, max_map_s, yellow_lane_d, lane_width),
+				checkLaneEmpty(lane_id2, lane_id2_s_list, sensor_fusion, max_map_s, yellow_lane_d, lane_width));
 		}
 	}
 	else {
