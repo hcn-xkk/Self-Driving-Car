@@ -244,6 +244,7 @@ int main() {
 						ref_speed += speed_increment; // using -5m/s^2 accel
 					}
 					else {
+						ref_speed = set_speed;
 						//id_accel = +0.0;
 					}
 					/*if (b_too_close) {
