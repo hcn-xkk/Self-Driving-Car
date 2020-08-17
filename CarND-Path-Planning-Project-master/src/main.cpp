@@ -154,9 +154,9 @@ int main() {
 					std::cout << "set_speed after checking predecessor  " << set_speed << std::endl;
 
 					// Set acceleration / deceleration for generating future waypoints.
-					double set_accel = 2.5;
+					double set_accel = 5;
 
-					double speed_increment = set_accel * (0.5*T);  // 
+					double speed_increment = set_accel * (dT);  // 
 					double k_accel;
 					if (ref_speed > set_speed + speed_increment) {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
