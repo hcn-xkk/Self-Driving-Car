@@ -412,7 +412,7 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 	vector<double> behavior_parameters;
 	if (behavior_mode == 0 || behavior_mode == 2 || behavior_mode == 4) {
 		double T_planned = previous_length * dT;
-		double T_end = T;
+		double T_end = std::max(T, T_planned+T/2.0);
 		double s_start = end_path_s;
 		double d_s_start = sqrt(pow((previous_path_x[previous_length-1]- previous_path_x[previous_length - 2])/dT,2) + 
 			pow((previous_path_y[previous_length - 1] - previous_path_y[previous_length - 2]) / dT, 2));
