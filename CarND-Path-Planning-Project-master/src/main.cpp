@@ -171,7 +171,7 @@ int main() {
 
 						// Push the future points
 						double t1, ref_s_new, ref_d_new;
-						ref_d_new = yellow_line_d + lane_width * (double)getLaneId(end_path_d, yellow_line_d, lane_width);
+						ref_d_new = yellow_line_d + lane_width*0.5 + lane_width * (double)getLaneId(end_path_d, yellow_line_d, lane_width);
 						for (int i = 1; i <= 3; i++) {
 							t1 = previous_length * dT + dT + (double)i * (T - dT - previous_length * dT) / 3.0;
 							ref_s_new = calculatePolynomial(behavior_parameters, t1);
@@ -209,7 +209,7 @@ int main() {
 
 						// Push the future points
 						double t1, ref_s_new, ref_d_new;
-						ref_d_new = yellow_line_d + lane_width * (double)lane_id;
+						ref_d_new = yellow_line_d + lane_width * 0.5 + lane_width * (double)lane_id;
 						std::cout << "behavior_parameters" << behavior_parameters[0] << behavior_parameters[1]
 							<< behavior_parameters[2] << behavior_parameters[3] << behavior_parameters[4]
 							<< behavior_parameters[5] << std::endl;
