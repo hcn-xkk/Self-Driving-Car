@@ -359,7 +359,7 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 	vector<double> previous_path_x, vector<double> previous_path_y, double end_path_s, double end_path_d,
 	double set_speed, double max_map_s,
 	double car_s, double car_d, double car_speed, 
-	double yellow_lane_d, double lane_width) {
+	double yellow_line_d, double lane_width) {
 	// mode: 
 	// [0]: keep lane, re-use previous traj and track set_speed. {T_planned,T_end,s_f,ds_f,dds_f}. 
 	// [1]: planned keep lane, generate new trajectory. Output minimum jerk traj {T_end,s_f,ds_f,dds_f},T_planned=0.
@@ -393,8 +393,8 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 					lane_id2_s_list.push_back(planned_lane_s_list[i]);
 				}
 			}
-			behavior_mode = 2 + std::max(checkLaneEmpty(lane_id1, lane_id1_s_list, sensor_fusion, max_map_s, yellow_lane_d, lane_width),
-				checkLaneEmpty(lane_id2, lane_id2_s_list, sensor_fusion, max_map_s, yellow_lane_d, lane_width));
+			behavior_mode = 2 + std::max(checkLaneEmpty(lane_id1, lane_id1_s_list, sensor_fusion, max_map_s, yellow_line_d, lane_width),
+				checkLaneEmpty(lane_id2, lane_id2_s_list, sensor_fusion, max_map_s, yellow_line_d, lane_width));
 		}
 		else { // mode 4 or 5
 			int lane_id1 = *planned_lane_id_list.begin();
@@ -408,8 +408,8 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 					lane_id2_s_list.push_back(planned_lane_s_list[i]);
 				}
 			}
-			behavior_mode = 4 + std::max(checkLaneEmpty(lane_id1, lane_id1_s_list, sensor_fusion, max_map_s, yellow_lane_d, lane_width),
-				checkLaneEmpty(lane_id2, lane_id2_s_list, sensor_fusion, max_map_s, yellow_lane_d, lane_width));
+			behavior_mode = 4 + std::max(checkLaneEmpty(lane_id1, lane_id1_s_list, sensor_fusion, max_map_s, yellow_line_d, lane_width),
+				checkLaneEmpty(lane_id2, lane_id2_s_list, sensor_fusion, max_map_s, yellow_line_d, lane_width));
 		}
 	}
 	else {
@@ -465,7 +465,7 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 		double s_end = car_s + (T_end - T_planned) * set_speed;
 		double d_s_end = set_speed;
 		double dd_s_end = 0.0;
-		lane_id2 = getLaneId(car_d, yellow_lane_d, lane_width);
+		lane_id2 = getLaneId(car_d, yellow_line_d, lane_width);
 		// look for preceding vehicle and track
 		for (int i = 0; i < sensor_fusion.size(); i++) {
 			if (lane_id2 == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {

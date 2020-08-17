@@ -174,7 +174,7 @@ int main() {
 						for (int i = 0; i < sensor_fusion.size(); i++) {
 							if (lane_id == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {
 								double vx = sensor_fusion[i][3];
-								double vy = sensor_fusion[i][4]
+								double vy = sensor_fusion[i][4];
 								check_speed = sqrt(pow(vx, 2) + pow(vy, 2));
 								double prev_check_car_s = sensor_fusion[i][5];
 								check_car_s = prev_check_car_s + dT * check_speed;
