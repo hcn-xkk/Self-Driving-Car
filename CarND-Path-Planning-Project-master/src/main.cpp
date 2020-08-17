@@ -112,7 +112,7 @@ int main() {
 					 // then use assume constant speed along lane
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // Time span of the sent trajectory
-					double set_speed = 50.0 * 0.44;     // [m/s] travel with 50Mph
+					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
 
 					// - Find current lane_id:
 					// lane width 4, double yellow lane d=0
@@ -146,7 +146,7 @@ int main() {
 					double ref_y;
 					double ref_x;
 					
-					if (false && previous_length >= 2) {
+					if (true && previous_length >= 2) {
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
@@ -191,7 +191,7 @@ int main() {
 					}
 
 					// Push the future points
-					double dist_inc = 30.0; // set_speed * T / 3.0;
+					double dist_inc = set_speed * T / 3.0;
 					for (int i = 1; i <= 3; i++) {
 						//
 						vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
