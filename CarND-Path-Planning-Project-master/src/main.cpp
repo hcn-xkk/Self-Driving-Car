@@ -243,7 +243,7 @@ int main() {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
 						id_accel = -1.0;
 						if (check_car_s - car_s < ref_speed * T) {
-							id_accel *= (1.5 - (check_car_s - car_s) / (ref_speed * T));
+							id_accel -= 0.5 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
 						}
 						
 					}
@@ -254,6 +254,9 @@ int main() {
 					else {
 						ref_speed = set_speed;
 						id_accel = +0.0;
+						if (check_car_s - car_s < ref_speed * T) {
+							id_accel -= 0.5 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
+						}
 					}
 					/*if (b_too_close) {
 						set_speed = check_speed;
