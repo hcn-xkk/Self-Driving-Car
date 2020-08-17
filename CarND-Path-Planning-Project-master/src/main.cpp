@@ -120,7 +120,7 @@ int main() {
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * 0.44);
-					double ref_accel = 5;
+					double ref_accel = 4.0;
 
 					// - Find current lane_id:
 					int lane_id = getLaneId(car_d, yellow_line_d, lane_width);
@@ -159,10 +159,10 @@ int main() {
 					// Set acceleration / deceleration for generating future waypoints.
 					double speed_increment;
 					if (car_speed < 0.5 * ref_speed) {
-						speed_increment = ref_accel * (0.5*T);  // 
+						speed_increment = ref_accel * (0.4*T);  // 
 					}
 					else {
-						speed_increment = ref_accel * (0.25*T);  // 
+						speed_increment = ref_accel * (0.2*T);  // 
 					}
 					double k_accel;
 					if (ref_speed > set_speed + speed_increment) {
