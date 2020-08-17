@@ -232,20 +232,23 @@ int main() {
 
 
 					}
-					double speed_increment = 5.0 * T;
+					double set_accel = 5.0;
+					double speed_increment = set_accel * T;
 					double id_accel = 0.0;
 					if (b_too_close) {
 						set_speed = check_speed;
 					}
 					if (ref_speed > set_speed + speed_increment) {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
+						id_accel = -1.0;
 					}
-					else if (ref_speed < set_speed - 5.0*speed_increment) {
+					else if (ref_speed < set_speed - speed_increment) {
 						ref_speed += speed_increment; // using -5m/s^2 accel
+						id_accel = 1.0;
 					}
 					else {
 						ref_speed = set_speed;
-						//id_accel = +0.0;
+						id_accel = +0.0;
 					}
 					/*if (b_too_close) {
 						set_speed = check_speed;
@@ -307,7 +310,11 @@ int main() {
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
 						next_y_vals.push_back(new_xy_global[1]);
-						delta_x_car += std::min(set_speed, (ref_speed + id_accel * speed_increment * i)) * dT;
+						if (fabs(ref_speed - set_speed) > set_accel * dT) {
+							ref_speed += id_accel * set_accel * dT;
+						}
+						delta_x_car += ref_speed * dT;
+						//delta_x_car += std::min(set_speed, (ref_speed + id_accel * speed_increment * i)) * dT;
 					}
 					/*std::cout << "This is printing next_x_vals : " << std::endl;
 					printVector(next_x_vals);
