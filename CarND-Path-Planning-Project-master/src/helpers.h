@@ -366,7 +366,7 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 	int behavior_mode;
 	int lane_id2;
 	// max_map_s = 6945.554;
-	if (previous_length >= 3) {
+	if (false && previous_length >= 3) {
 		if (*planned_lane_id_list.begin() == *(planned_lane_id_list.end() - 1)) { // mode 0 or 1.
 			// check if there is vehicle inside (d,s) range
 			behavior_mode = 0; // +checkLaneEmpty(*planned_lane_id_list.begin(), planned_lane_s_list, sensor_fusion);

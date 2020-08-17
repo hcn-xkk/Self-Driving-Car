@@ -150,7 +150,8 @@ int main() {
 					double ref_yaw;
 					double ref_y;
 					double ref_x;
-					if (false && (behavior_mode == 0 || behavior_mode == 2 || behavior_mode == 4)) {
+					std::cout << " ----------------------- " << std::endl;
+					if ((behavior_mode == 0 || behavior_mode == 2 || behavior_mode == 4)) {
 						for (int i = 0; i < previous_length; i++) {
 							next_x_vals.push_back(previous_path_x[i]);
 							next_y_vals.push_back(previous_path_y[i]);
