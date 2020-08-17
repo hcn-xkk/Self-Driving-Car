@@ -114,8 +114,8 @@ int main() {
 					Create x and y waypoints
 					------------------------------------------------------------------------
 					*/
-					double dt = 0.02;   // delta for the sent out trajectories
-					double t = 1.0;     // time span of the sent trajectory
+					double dT = 0.02;   // delta for the sent out trajectories
+					double T = 1.0;     // time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50mph
 					double ref_speed = std::max(0.0, car_speed * 0.44);
 
