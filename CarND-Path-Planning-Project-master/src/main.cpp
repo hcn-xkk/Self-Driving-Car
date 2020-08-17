@@ -126,7 +126,7 @@ int main() {
 					vector<int> planned_lane_id_list;
 					vector<vector<double>> planned_lane_s_list;
 					tie(planned_lane_id_list, planned_lane_s_list) = getRegionToTravel(end_path_s, end_path_d,
-						car_s, car_d, set_speed, (int)(T / dT), previous_length, max_s, yellow_line_d, lane_width);
+						car_s, car_d, set_speed, (int)(T / dT), previous_length, max_s, yellow_line_d, lane_width, dT);
 					std::cout << " planned_lane_id_list " << std::endl;
 					printVector(planned_lane_id_list);
 					std::cout << " planned_lane_s_list " << std::endl;

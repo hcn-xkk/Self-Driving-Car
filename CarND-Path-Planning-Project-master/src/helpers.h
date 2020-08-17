@@ -320,7 +320,7 @@ vector<double> JMT(vector<double> &start, vector<double> &end, double T_start, d
 
 std::tuple<vector<int>, vector<vector<double>> > getRegionToTravel(double end_previous_path_s, double end_previous_path_d, 
 	double car_s, double car_d, double set_speed, int N, int previous_length, double max_map_s, 
-	double yellow_line_d, double lane_width) {
+	double yellow_line_d, double lane_width, double dT) {
 	// Generate the list of lane_id(s) and list of road segments in s (Frenet) coordinate
 	// in T=1second horizon, at most one lane change is planned. 
 	// If car_d == end_path_d, then there is not lane change.
