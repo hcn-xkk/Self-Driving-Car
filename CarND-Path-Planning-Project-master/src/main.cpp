@@ -113,7 +113,7 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // Time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
-					double ref_speed = car_speed;
+					double ref_speed = car_speed * 0.44;
 					bool b_too_close = false;
 					// - Find current lane_id:
 					// lane width 4, double yellow lane d=0
@@ -224,6 +224,7 @@ int main() {
 					std::cout << "car_d " << car_d << std::endl;
 					std::cout << "car_x " << car_x << std::endl;
 					std::cout << "car_Y " << car_y << std::endl;
+					std::cout << "car_speed " << car_speed * 0.44 << std::endl;
 					std::cout << "car_yaw " << car_yaw << std::endl;  
 					std::cout << "ref_yaw " << ref_yaw << std::endl;
 					for (int i = 1; i <= 3; i++) {
