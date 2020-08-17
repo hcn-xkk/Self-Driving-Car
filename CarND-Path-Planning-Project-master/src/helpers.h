@@ -329,7 +329,7 @@ std::tuple<vector<int>, vector<vector<double>> > getRegionToTravel(double end_pr
 	vector<vector<double>> planned_lane_s_list;
 	if (true) { // && (getLaneId(car_d, yellow_line_d, lane_width) == getLaneId(end_path_d, yellow_line_d, lane_width))) { 
 		// case with no lane change
-		double end_path_s = end_previous_path_s + set_speed * (N - previous_length);
+		double end_path_s = end_previous_path_s + set_speed * (N - previous_length) * dT;
 		if (end_path_s <= max_map_s) { // no looping the cycle happening.
 			planned_lane_id_list.push_back(getLaneId(car_d, yellow_line_d, lane_width));
 			planned_lane_s_list.push_back({ car_s, end_path_s });
