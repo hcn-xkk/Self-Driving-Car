@@ -225,7 +225,37 @@ void printVector(vector<int> v) {
 
 
 inline int getLaneId(double d, double yellow_line_d, double lane_width) {
-	return (int)floor((d - yellow_line_d) / lane_width);
+
+	if ((d - yellow_line_d) < lane_width) { return 0; }
+	else if ((d - yellow_line_d) < lane_width * 2) { return 1; }
+	else { return 2; }
+
+}
+
+
+
+bool findPredecessorInSegment(int lane_id, double yellow_line_d, double lane_width,
+	double segment_start, double & check_car_s, double & check_speed, vector<vector<double>>sensor_fusion) {
+	bool is_ocupied = false;
+	for (int i = 0; i < sensor_fusion.size(); i++) {
+		double check_d = sensor_fusion[i][6];
+		if ((check_d > yellow_line_d + (double)lane_id*lane_width) && (check_d < yellow_line_d + (double)lane_id*lane_width + lane_width)) {
+			double vx = sensor_fusion[i][3];
+			double vy = sensor_fusion[i][4];
+			double v = sqrt(pow(vx, 2) + pow(vy, 2));
+			double prev_check_car_s = sensor_fusion[i][5];
+			double s = prev_check_car_s + dT * v;
+			
+			if (((s >= segment_start) && (s < check_car_s))) {
+				is_ocupied = true;
+				if (s < check_car_s) {
+					check_car_s = s;
+					check_speed = v;
+				}
+			}
+		}
+	}
+	return is_ocupied;
 }
 
 

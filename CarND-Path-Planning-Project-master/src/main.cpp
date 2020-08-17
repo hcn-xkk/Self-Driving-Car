@@ -113,60 +113,61 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // Time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
-					double ref_speed = std::max(0.0,car_speed * 0.44);
-					bool b_too_close = false;
-					double check_speed, check_car_s;
-
+					double ref_speed = std::max(0.0, car_speed * 0.44);
+					
+					/* ---------- Create x and y waypoints ---------- */
 					// - Find current lane_id:
 					// lane width 4, double yellow lane d=0
-					int lane_id;
-					if (car_d < 4) { lane_id = 0; }
+					int lane_id = getLaneId(car_d, yellow_line_d, lane_width);
+					/*if (car_d < 4) { lane_id = 0; }
 					else if (car_d < 8) { lane_id = 1; }
-					else { lane_id = 2; }
+					else { lane_id = 2; }*/
 
 					int previous_length = previous_path_x.size();
-					// Region to check: [car_s, car_s + set_speed * T]
-					vector<int> planned_lane_id_list;
-					vector<vector<double>> planned_lane_s_list;
-					tie(planned_lane_id_list, planned_lane_s_list) = getRegionToTravel(end_path_s, end_path_d,
-						car_s, car_d, set_speed, (int)(T / dT), previous_length, max_s, yellow_line_d, lane_width, dT);
-					std::cout << " planned_lane_id_list " << std::endl;
-					printVector(planned_lane_id_list);
-					std::cout << " planned_lane_s_list " << std::endl;
-					printVector(planned_lane_s_list[0]);
+					//// Region to check: [car_s, car_s + set_speed * T]
+					//vector<int> planned_lane_id_list;
+					//vector<vector<double>> planned_lane_s_list;
+					//tie(planned_lane_id_list, planned_lane_s_list) = getRegionToTravel(end_path_s, end_path_d,
+					//	car_s, car_d, set_speed, (int)(T / dT), previous_length, max_s, yellow_line_d, lane_width, dT);
+					//std::cout << " planned_lane_id_list " << std::endl;
+					//printVector(planned_lane_id_list);
+					//std::cout << " planned_lane_s_list " << std::endl;
+					//printVector(planned_lane_s_list[0]);
+
 					/*int lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], planned_lane_s_list, sensor_fusion, max_s, yellow_line_d, lane_width);
 					*/
-					int lane_is_ocupied = 0;
-					for (int i = 0; i < sensor_fusion.size(); i++) {
-						double check_d = sensor_fusion[i][6];
-						if ((check_d > (double)lane_id*4.0) && (check_d < (double)lane_id*4.0+4.0)) {
-							double vx = sensor_fusion[i][3];
-							double vy = sensor_fusion[i][4];
-							check_speed = sqrt(pow(vx, 2) + pow(vy, 2));
-							double prev_check_car_s = sensor_fusion[i][5];
-							check_car_s = prev_check_car_s + dT * check_speed;
-							if (((check_car_s >= car_s) && (check_car_s < car_s + set_speed * T))) {
-								lane_is_ocupied = 1;
-								break;
-							}
+					bool lane_is_ocupied = false;
+					double check_car_s;
+					check_car_s = car_s + set_speed * T;
+					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
+					lane_is_ocupied = findPredecessorInSegment(lane_id, 
+						yellow_line_d, lane_width, car_s, check_car_s, set_speed, sensor_fusion);
+					std::cout << " lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
+
+					if (lane_is_ocupied) { // re-use a shorter previous path
+						if (previous_length >=4) {
+							previous_length = previous_length / 2;
 						}
 					}
-					std::cout << " lane_is_ocupied " << lane_is_ocupied << std::endl;
+					
+					std::cout << "set_speed after checking predecessor  " << set_speed << std::endl;
 
-					// - Create x and y waypoints:
-					double new_car_s;
+					/* ---------- Create x and y waypoints ---------- */
+					// - Declare x and y waypoints:
 					vector<double> new_car_x_waypoints;
 					vector<double> new_car_y_waypoints;
-					vector<double> new_car_t_waypoints;
 
-					// Push the previous_path_x,previous_path_y into waypoints:
-					// Including previous planned paths will help consistency.
-					
+					// Push the previous_path_x,previous_path_y or current states into waypoints.
+					// This is to have frame-to-frame consistency.
 					double ref_yaw;
 					double ref_y;
 					double ref_x;
 					
-					if (true && (lane_is_ocupied==0) && previous_length >= 2) {
+					if (previous_length >= 2) {
+						for (int i = 0; i < previous_length; i++) {
+							next_x_vals.push_back(previous_path_x[i]);
+							next_y_vals.push_back(previous_path_y[i]);
+						}
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
@@ -179,66 +180,26 @@ int main() {
 						new_car_x_waypoints.push_back(ref_x);
 						new_car_y_waypoints.push_back(ref_y_prev);
 						new_car_y_waypoints.push_back(ref_y);
-
-						for (int i = 0; i < previous_length; i++) {
-							next_x_vals.push_back(previous_path_x[i]);
-							next_y_vals.push_back(previous_path_y[i]);
-						}
-						check_speed = set_speed; 
-						check_car_s = car_s + set_speed * T;
-
-					}
-					else if (lane_is_ocupied == 1 && previous_length >= 2) {
-						// look for preceding vehicle and track
-						previous_length = previous_length / 2;
-						if (previous_length < 2) {
-							previous_length = 2;
-						}
-						b_too_close = true;
-						std::cout << "Get to the else IF" << std::endl;
-						// Going one step backwards
-
-						ref_y = previous_path_y[previous_length - 1];
-						double ref_y_prev = previous_path_y[previous_length - 2];
-						ref_x = previous_path_x[previous_length - 1];
-						double ref_x_prev = previous_path_x[previous_length - 2];
-						ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
-
-						new_car_x_waypoints.push_back(ref_x_prev);
-						new_car_x_waypoints.push_back(ref_x);
-						new_car_y_waypoints.push_back(ref_y_prev);
-						new_car_y_waypoints.push_back(ref_y);
-
-
-						for (int i = 0; i < previous_length; i++) {
-							next_x_vals.push_back(previous_path_x[i]);
-							next_y_vals.push_back(previous_path_y[i]);
-						}
 					}
 					else {
 						std::cout << "Get to the else" << std::endl;
 						// Going one step backwards
-						
+						ref_x = car_x;
+						ref_y = car_y;
+						ref_yaw = car_yaw;
+
 						new_car_x_waypoints.push_back(car_x - 1 * cos(car_yaw));
 						new_car_y_waypoints.push_back(car_y - 1 * sin(car_yaw));
 						// Push the current point
 						new_car_x_waypoints.push_back(car_x);
 						new_car_y_waypoints.push_back(car_y);
-						
-						ref_x = car_x;
-						ref_y = car_y;
-						ref_yaw = car_yaw;
-						//ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
-
-
 					}
+
 					double set_accel = 2.5;
 					double speed_increment = set_accel * (0.5*T);
 
 					double id_accel = 0.0;
-					if (b_too_close) {
-						set_speed = check_speed;
-					}
+					
 					if (ref_speed > set_speed + speed_increment) {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
 						id_accel = -1.0;
@@ -258,16 +219,8 @@ int main() {
 							id_accel -= 0.5 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
 						}
 					}
-					/*if (b_too_close) {
-						set_speed = check_speed;
-						ref_speed = 10;
-					}
-					else {
-						ref_speed = set_speed;
-					}*/
 
-					std::cout << "b_too_close " << (int)b_too_close << std::endl;
-					std::cout << "check_speed " << check_speed << std::endl;
+					std::cout << "lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
 					std::cout << "set_speed " << set_speed << std::endl;
 					std::cout << "ref_speed " << ref_speed << std::endl;
 					// Push the future points
@@ -283,6 +236,7 @@ int main() {
 					/*std::cout << "car_yaw " << car_yaw << std::endl;  
 					std::cout << "ref_yaw " << ref_yaw << std::endl;*/
 					for (int i = 1; i <= 3; i++) {
+						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * i;
 						vector<double> new_car_xy = getXY(new_car_s, 2.0 + (double)lane_id*4.0,
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
