@@ -115,6 +115,8 @@ int main() {
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
 					double ref_speed = car_speed * 0.44;
 					bool b_too_close = false;
+					double check_speed, check_car_s;
+
 					// - Find current lane_id:
 					// lane width 4, double yellow lane d=0
 					int lane_id;
@@ -132,7 +134,21 @@ int main() {
 					printVector(planned_lane_id_list);
 					std::cout << " planned_lane_s_list " << std::endl;
 					printVector(planned_lane_s_list[0]);
-					int lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], planned_lane_s_list, sensor_fusion, max_s, yellow_line_d, lane_width);
+					/*int lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], planned_lane_s_list, sensor_fusion, max_s, yellow_line_d, lane_width);
+					*/
+					int lane_is_ocupied = 0;
+					for (int i = 0; i < sensor_fusion.size(); i++) {
+						if (lane_id == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {
+							double vx = sensor_fusion[i][3];
+							double vy = sensor_fusion[i][4];
+							check_speed = sqrt(pow(vx, 2) + pow(vy, 2));
+							double prev_check_car_s = sensor_fusion[i][5];
+							check_car_s = prev_check_car_s + dT * check_speed;
+							if (((check_car_s >= car_s) && (check_car_s < car_s + check_speed * T))) {
+								lane_is_ocupied = 1;
+							}
+						}
+					}
 					std::cout << " lane_is_ocupied " << lane_is_ocupied << std::endl;
 
 					// - Create x and y waypoints:
@@ -147,8 +163,7 @@ int main() {
 					double ref_yaw;
 					double ref_y;
 					double ref_x;
-					double check_speed, check_car_s;
-
+					
 					if (true && (lane_is_ocupied==0) && previous_length >= 2) {
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
@@ -205,20 +220,26 @@ int main() {
 
 					}
 					double speed_increment = 25 * dT;
+					double id_accel = 0;
 					if (b_too_close) {
-						if (ref_speed > check_speed) {
+						set_speed = check_speed;
+						if (ref_speed > set_speed) {
 							ref_speed -= speed_increment; // using -5m/s^2 accel
+							id_accel = -1;
 						}
 						else {
-							ref_speed = std::min(check_speed, ref_speed + speed_increment);
+							ref_speed = std::min(set_speed, ref_speed + speed_increment);
+							id_accel = +1;
 						}
 					}
 					else {
 						if (ref_speed < set_speed) {
 							ref_speed += speed_increment; // using 5m/s^2 accel
+							id_accel = +1;
 						}
 						else {
-							ref_speed = set_speed;
+							ref_speed = std::min(set_speed, ref_speed + speed_increment);
+							id_accel = 0;
 						}
 					}
 					std::cout << "ref_speed " << ref_speed << std::endl;
@@ -264,12 +285,13 @@ int main() {
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
 					int l = next_x_vals.size();
 					for (int i = 1; i <= T / dT - l; i++) {
-						new_x_car = i * delta_x_car + starting_xy_car[0];
+						new_x_car = delta_x_car + starting_xy_car[0];
 						new_y_car = spline_xy_car(new_x_car);
 						// Transform back to global coordinates
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
 						next_y_vals.push_back(new_xy_global[1]);
+						delta_x_car += std::min(set_speed, (ref_speed + id_accel * speed_increment)) * dT;
 					}
 					std::cout << "This is printing next_x_vals : " << std::endl;
 					printVector(next_x_vals);
