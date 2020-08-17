@@ -113,7 +113,7 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // Time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
-					double ref_speed = car_speed * 0.44;
+					double ref_speed = std::max(10,car_speed * 0.44);
 					bool b_too_close = false;
 					double check_speed, check_car_s;
 
@@ -145,7 +145,7 @@ int main() {
 							check_speed = sqrt(pow(vx, 2) + pow(vy, 2));
 							double prev_check_car_s = sensor_fusion[i][5];
 							check_car_s = prev_check_car_s + dT * check_speed;
-							if (((check_car_s >= car_s) && (check_car_s < car_s + set_speed*10 * T))) {
+							if (((check_car_s >= car_s) && (check_car_s < car_s + set_speed * T))) {
 								lane_is_ocupied = 1;
 								break;
 							}
@@ -221,7 +221,7 @@ int main() {
 
 
 					}
-					double speed_increment = 10 * dT;
+					double speed_increment = 5 * dT;
 					double id_accel = 0;
 					if (b_too_close) {
 						set_speed = check_speed;
