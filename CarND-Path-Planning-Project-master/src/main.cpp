@@ -232,7 +232,7 @@ int main() {
 
 
 					}
-					double set_accel = 5.0;
+					double set_accel = 2.5;
 					double speed_increment = set_accel * (0.5*T);
 
 					double id_accel = 0.0;
