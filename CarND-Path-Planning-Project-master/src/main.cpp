@@ -173,8 +173,8 @@ int main() {
 						ref_x = previous_path_x[previous_length - 1];
 						double ref_x_prev = previous_path_x[previous_length - 2];
 						std::cout << ref_x << ' ' << ref_x_prev << std::endl;
-
 						ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
+						
 						new_car_x_waypoints.push_back(ref_x_prev);
 						new_car_x_waypoints.push_back(ref_x);
 						new_car_y_waypoints.push_back(ref_y_prev);
@@ -190,21 +190,30 @@ int main() {
 					}
 					else if (lane_is_ocupied == 1 && previous_length >= 2) {
 						// look for preceding vehicle and track
+						previous_length = previous_length / 2;
+						if (previous_length < 2) {
+							previous_length = 2;
+						}
 						b_too_close = true;
 						std::cout << "Get to the else IF" << std::endl;
 						// Going one step backwards
-
-						new_car_x_waypoints.push_back(car_x - 1 * cos(car_yaw));
-						new_car_y_waypoints.push_back(car_y - 1 * sin(car_yaw));
-						// Push the current point
-						new_car_x_waypoints.push_back(car_x);
-						new_car_y_waypoints.push_back(car_y);
 
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
 						ref_x = previous_path_x[previous_length - 1];
 						double ref_x_prev = previous_path_x[previous_length - 2];
 						ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
+
+						new_car_x_waypoints.push_back(ref_x_prev);
+						new_car_x_waypoints.push_back(ref_x);
+						new_car_y_waypoints.push_back(ref_y_prev);
+						new_car_y_waypoints.push_back(ref_y);
+
+
+						for (int i = 0; i < previous_length; i++) {
+							next_x_vals.push_back(previous_path_x[i]);
+							next_y_vals.push_back(previous_path_y[i]);
+						}
 					}
 					else {
 						std::cout << "Get to the else" << std::endl;
