@@ -169,9 +169,8 @@ int main() {
 					}
 					else {
 						std::cout << "Get to the else" << std::endl;
-						ref_yaw = car_yaw;
 						// Going one step backwards
-						if (car_speed > 0) {
+						if (false) {
 							new_car_x_waypoints.push_back(car_x - car_speed * dT * cos(car_yaw));
 							new_car_y_waypoints.push_back(car_y - car_speed * dT * sin(car_yaw));
 							// Push the current point
@@ -179,14 +178,15 @@ int main() {
 							new_car_y_waypoints.push_back(car_y);
 						}
 						else {
-							new_car_x_waypoints.push_back(car_x - 1 * dT * cos(car_yaw));
-							new_car_y_waypoints.push_back(car_y - 1 * dT * sin(car_yaw));
+							new_car_x_waypoints.push_back(car_x - 1 * cos(car_yaw));
+							new_car_y_waypoints.push_back(car_y - 1 * sin(car_yaw));
 							// Push the current point
 							new_car_x_waypoints.push_back(car_x);
 							new_car_y_waypoints.push_back(car_y);
 						}
 						ref_x = car_x;
 						ref_y = car_y;
+						ref_yaw = car_yaw;
 
 
 					}
