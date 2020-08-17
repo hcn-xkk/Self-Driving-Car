@@ -113,7 +113,7 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // Time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
-					double ref_speed = std::max(15.0,car_speed * 0.44);
+					double ref_speed = std::max(0.0,car_speed * 0.44);
 					bool b_too_close = false;
 					double check_speed, check_car_s;
 
