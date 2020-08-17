@@ -145,7 +145,7 @@ int main() {
 					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
 					lane_is_ocupied = findPredecessorInSegment(lane_id, 
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
-					std::cout << " lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
+					// std::cout << " lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
 
 					if (lane_is_ocupied) { // re-use a shorter previous path
 						if (previous_length >=4) {
@@ -154,7 +154,7 @@ int main() {
 					}
 					/*int lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], planned_lane_s_list, sensor_fusion, max_s, yellow_line_d, lane_width);
 					*/
-					std::cout << "set_speed after checking predecessor  " << set_speed << std::endl;
+					//std::cout << "set_speed after checking predecessor  " << set_speed << std::endl;
 
 					// Set acceleration / deceleration for generating future waypoints.
 					double speed_increment;
@@ -185,9 +185,9 @@ int main() {
 					}
 					ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
 
-					std::cout << "lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
+					/*std::cout << "lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
 					std::cout << "set_speed " << set_speed << std::endl;
-					std::cout << "ref_speed " << ref_speed << std::endl;
+					std::cout << "ref_speed " << ref_speed << std::endl;*/
 
 
 					// - Create x and y waypoints:
@@ -205,7 +205,7 @@ int main() {
 							next_x_vals.push_back(previous_path_x[i]);
 							next_y_vals.push_back(previous_path_y[i]);
 						}
-						std::cout << "Get to the if" << std::endl;
+						//std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
 						ref_x = previous_path_x[previous_length - 1];
@@ -219,7 +219,7 @@ int main() {
 						new_car_y_waypoints.push_back(ref_y);
 					}
 					else {
-						std::cout << "Get to the else" << std::endl;
+						//std::cout << "Get to the else" << std::endl;
 						// Going one step backwards
 						ref_x = car_x;
 						ref_y = car_y;
@@ -259,10 +259,10 @@ int main() {
 					// Transform into car coordinates. 
 					auto new_car_carxy_waypoints = GlobalToCarTransform(new_car_x_waypoints,
 						new_car_y_waypoints, ref_x, ref_y, ref_yaw);
-					std::cout << "This is printing new_car_carxy_waypoints[0] : " << std::endl;
+					/*std::cout << "This is printing new_car_carxy_waypoints[0] : " << std::endl;
 					printVector(new_car_carxy_waypoints[0]);
 					std::cout << "This is printing new_car_carxy_waypoints[1] : " << std::endl;
-					printVector(new_car_carxy_waypoints[1]);
+					printVector(new_car_carxy_waypoints[1]);*/
 
 					// - Create x and y interpolated reference points:
 					tk::spline spline_xy_car;   // this is in car coordinates align with heading
