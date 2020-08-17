@@ -168,15 +168,15 @@ int main() {
 						}
 
 					}
-					else if (lane_is_ocupied == 1) {
+					else if (lane_is_ocupied == 1 && previous_length >= 2) {
 						double check_speed, check_car_s;
 						// look for preceding vehicle and track
 						for (int i = 0; i < sensor_fusion.size(); i++) {
-							if (lane_id == sensor_fusion[i][6]) {
+							if (lane_id == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {
 								check_speed = sqrt(pow(sensor_fusion[i][3], 2) + pow(sensor_fusion[i][4], 2));
 								check_car_s = sensor_fusion[i][5] + dT * check_speed;
 								if (((sensor_fusion[i][5] >= car_s) && (sensor_fusion[i][5] < car_s + set_speed*T)) || 
-									((sensor_fusion[i][5] + max_map_s >= s_start) && (sensor_fusion[i][5] + max_map_s < s_end))) {
+									((sensor_fusion[i][5] + max_s >= car_s) && (sensor_fusion[i][5] + max_s < car_s + set_speed * T))) {
 									b_too_close = true;
 								}
 							}

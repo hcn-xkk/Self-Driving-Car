@@ -434,7 +434,7 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 		std::cout << "original s_end is " << s_end << std::endl;
 		// look for preceding vehicle and track
 		for (int i = 0; i < sensor_fusion.size(); i++) {
-			if (lane_id2 == sensor_fusion[i][6]) {
+			if (lane_id2 == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {
 				if ((sensor_fusion[i][5] >= s_start) && (sensor_fusion[i][5] < s_end)) {
 					s_end = sensor_fusion[i][5];
 					d_s_end = sqrt(pow(sensor_fusion[i][3], 2) + pow(sensor_fusion[i][4], 2));
@@ -468,7 +468,7 @@ std::tuple<int, vector<double>> planBehaviorAndTraj(vector<int> planned_lane_id_
 		lane_id2 = getLaneId(car_d, yellow_lane_d, lane_width);
 		// look for preceding vehicle and track
 		for (int i = 0; i < sensor_fusion.size(); i++) {
-			if (lane_id2 == sensor_fusion[i][6]) {
+			if (lane_id2 == getLaneId(sensor_fusion[i][6], yellow_line_d, lane_width)) {
 				if ((sensor_fusion[i][5] >= s_start) && (sensor_fusion[i][5] < s_end)) {
 					s_end = sensor_fusion[i][5];
 					d_s_end = sqrt(pow(sensor_fusion[i][3], 2) + pow(sensor_fusion[i][4], 2));
