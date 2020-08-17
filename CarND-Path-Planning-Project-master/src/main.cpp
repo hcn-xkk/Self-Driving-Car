@@ -113,7 +113,7 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // Time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50Mph
-					double ref_speed = std::max(10.0,car_speed * 0.44);
+					double ref_speed = std::max(15.0,car_speed * 0.44);
 					bool b_too_close = false;
 					double check_speed, check_car_s;
 
@@ -244,19 +244,22 @@ int main() {
 							id_accel = 0;
 						}
 					}
+					std::cout << "b_too_close " << (int)b_too_close << std::endl;
+					std::cout << "check_speed " << check_speed << std::endl;
+					std::cout << "set_speed " << set_speed << std::endl;
 					std::cout << "ref_speed " << ref_speed << std::endl;
 					// Push the future points
 					double dist_inc = set_speed * T*0.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
-					std::cout << "farthest_sd " << std::endl;
+					//std::cout << "farthest_sd " << std::endl;
 					printVector(farthest_sd);
-					std::cout << "car_s " << car_s << std::endl;
+					/*std::cout << "car_s " << car_s << std::endl;
 					std::cout << "car_d " << car_d << std::endl;
 					std::cout << "car_x " << car_x << std::endl;
-					std::cout << "car_Y " << car_y << std::endl;
+					std::cout << "car_Y " << car_y << std::endl;*/
 					std::cout << "car_speed " << car_speed * 0.44 << std::endl;
-					std::cout << "car_yaw " << car_yaw << std::endl;  
-					std::cout << "ref_yaw " << ref_yaw << std::endl;
+					/*std::cout << "car_yaw " << car_yaw << std::endl;  
+					std::cout << "ref_yaw " << ref_yaw << std::endl;*/
 					for (int i = 1; i <= 3; i++) {
 						new_car_s = farthest_sd[0] + dist_inc * i;
 						vector<double> new_car_xy = getXY(new_car_s, 2.0 + (double)lane_id*4.0,
@@ -293,12 +296,12 @@ int main() {
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
 						next_y_vals.push_back(new_xy_global[1]);
-						delta_x_car += std::min(set_speed, (ref_speed + id_accel * speed_increment)) * dT;
+						delta_x_car += std::min(set_speed, (ref_speed + 0.5*id_accel * speed_increment)) * dT;
 					}
-					std::cout << "This is printing next_x_vals : " << std::endl;
+					/*std::cout << "This is printing next_x_vals : " << std::endl;
 					printVector(next_x_vals);
 					std::cout << "This is printing next_y_vals : " << std::endl;
-					printVector(next_y_vals);
+					printVector(next_y_vals);*/
 
 
 
