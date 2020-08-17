@@ -216,7 +216,12 @@ void printVector(vector<double> v) {
 	}
 	std::cout << ' ' << std::endl;
 }
-
+void printVector(vector<int> v) {
+	for (int i = 0; i < v.size(); i++) {
+		std::cout << v[i] << ' ';
+	}
+	std::cout << ' ' << std::endl;
+}
 
 
 int checkLaneEmpty(int lane_id, vector<vector<double>> lane_id_s_list, vector<vector<double>> sensor_fusion, double max_map_s) {
