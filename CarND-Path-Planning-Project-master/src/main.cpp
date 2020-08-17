@@ -147,7 +147,7 @@ int main() {
 					double ref_y;
 					double ref_x;
 					
-					if (false && (lane_is_ocupied==0) && previous_length >= 2) {
+					if (true && (lane_is_ocupied==0) && previous_length >= 2) {
 						std::cout << "Get to the if" << std::endl;
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
@@ -198,7 +198,9 @@ int main() {
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						std::cout << "car_x " << car_x << std::endl;
 						std::cout << "car_Y " << car_y << std::endl;
-						std::cout << "car_yaw " << car_yaw << std::endl;
+						std::cout << "car_yaw " << car_yaw << std::endl;  
+						std::cout << "ref_yaw " << ref_yaw << std::endl;
+						// TODO: car_yaw not accurately measured. Need a filter. 
 						std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
 						std::cout << "new_car_xy " << new_car_xy[1] << std::endl;
 						new_car_x_waypoints.push_back(new_car_xy[0]);
