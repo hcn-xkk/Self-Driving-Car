@@ -224,6 +224,11 @@ void printVector(vector<int> v) {
 }
 
 
+inline int getLaneId(double d, double yellow_line_d, double lane_width) {
+	return (int)floor((d - yellow_line_d) / lane_width);
+}
+
+
 int checkLaneEmpty(int lane_id, vector<vector<double>> lane_id_s_list, 
 	vector<vector<double>> sensor_fusion, double max_map_s, 
 	double yellow_line_d, double lane_width) {
@@ -247,10 +252,6 @@ int checkLaneEmpty(int lane_id, vector<vector<double>> lane_id_s_list,
 		}
 	}
 	return output;
-}
-
-inline int getLaneId(double d, double yellow_line_d, double lane_width) {
-	return (int)floor((d - yellow_line_d) / lane_width);
 }
 
 inline double calculatePolynomial(vector<double> c, double t) {
