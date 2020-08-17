@@ -141,7 +141,7 @@ int main() {
 					check_car_s = car_s + set_speed * T;
 					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
 					lane_is_ocupied = findPredecessorInSegment(lane_id, 
-						yellow_line_d, lane_width, car_s, check_car_s, set_speed, sensor_fusion);
+						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
 					std::cout << " lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
 
 					if (lane_is_ocupied) { // re-use a shorter previous path

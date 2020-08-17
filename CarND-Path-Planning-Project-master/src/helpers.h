@@ -235,7 +235,7 @@ inline int getLaneId(double d, double yellow_line_d, double lane_width) {
 
 
 bool findPredecessorInSegment(int lane_id, double yellow_line_d, double lane_width,
-	double segment_start, double & check_car_s, double & check_speed, vector<vector<double>>sensor_fusion) {
+	double dT, double segment_start, double & check_car_s, double & check_speed, vector<vector<double>>sensor_fusion) {
 	bool is_ocupied = false;
 	for (int i = 0; i < sensor_fusion.size(); i++) {
 		double check_d = sensor_fusion[i][6];
