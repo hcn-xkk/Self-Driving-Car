@@ -139,7 +139,7 @@ int main() {
 					int lane_is_ocupied = 0;
 					for (int i = 0; i < sensor_fusion.size(); i++) {
 						double check_d = sensor_fusion[i][6];
-						if (lane_id == getLaneId(check_d, yellow_line_d, lane_width)) {
+						if ((check_d > (double)lane_id*4.0) && (check_d < (double)lane_id*4.0+4.0)) {
 							double vx = sensor_fusion[i][3];
 							double vy = sensor_fusion[i][4];
 							check_speed = sqrt(pow(vx, 2) + pow(vy, 2));
@@ -266,8 +266,8 @@ int main() {
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						
 						// TODO: car_yaw not accurately measured. Need a filter. 
-						std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
-						std::cout << "new_car_xy " << new_car_xy[1] << std::endl;
+						/*std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
+						std::cout << "new_car_xy " << new_car_xy[1] << std::endl;*/
 						new_car_x_waypoints.push_back(new_car_xy[0]);
 						new_car_y_waypoints.push_back(new_car_xy[1]);
 					}
