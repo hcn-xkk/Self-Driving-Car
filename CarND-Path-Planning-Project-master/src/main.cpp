@@ -122,7 +122,7 @@ int main() {
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * 0.44);
-					double ref_accel = 3.0;
+					double ref_accel = 2.0;
 
 
 					// - Find current lane_id:
@@ -190,7 +190,7 @@ int main() {
 					double speed_increment;
 					if (car_speed < 0.5 * set_speed) {
 						ref_accel *= 2.0;
-						speed_increment = ref_accel * (0.8*T);  // 
+						speed_increment = ref_accel * (0.2*T);  // 
 					}
 					else {
 						speed_increment = ref_accel * (0.2*T);  // 
@@ -278,7 +278,7 @@ int main() {
 					std::cout << "ref_yaw " << ref_yaw << std::endl;*/
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
-						new_car_s = farthest_sd[0] + dist_inc * i;
+						new_car_s = farthest_sd[0] + dist_inc * (i+1);
 						vector<double> new_car_xy = getXY(new_car_s, lane_width/2.0 + (double)lane_id*lane_width,
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						// TODO: car_yaw not accurately measured. Need a filter. 
