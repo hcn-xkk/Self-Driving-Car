@@ -171,7 +171,7 @@ int main() {
 
 					// - Set acceleration / deceleration for generating future waypoints.
 					double distance_to_predecesor = check_car_s - car_s;
-					setACCSpeedAndAcceleration(ref_speed, ref_accel, set_speed, distance_to_predecesor, T)
+					setACCSpeedAndAcceleration(ref_speed, ref_accel, set_speed, distance_to_predecesor, T);
 					
 
 					// - Create x and y waypoints:

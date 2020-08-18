@@ -242,7 +242,7 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		ref_speed -= speed_increment; // using -5m/s^2 accel
 		k_accel = -1.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			k_accel -= 2.0* (1.2 - (check_car_s - car_s) / (ref_speed * T));
+			k_accel -= 2.0* (1.2 - (distance_to_predecesor) / (ref_speed * T));
 		}
 	}
 	else if (ref_speed < set_speed - speed_increment) {
