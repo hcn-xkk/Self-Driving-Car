@@ -127,16 +127,7 @@ int main() {
 					
 					// - Find length of previous path:
 					int previous_length = previous_path_x.size();
-					//// Region to check: [car_s, car_s + set_speed * T]
-					//vector<int> planned_lane_id_list;
-					//vector<vector<double>> planned_lane_s_list;
-					//tie(planned_lane_id_list, planned_lane_s_list) = getRegionToTravel(end_path_s, end_path_d,
-					//	car_s, car_d, set_speed, (int)(T / dT), previous_length, max_s, yellow_line_d, lane_width, dT);
-					//std::cout << " planned_lane_id_list " << std::endl;
-					//printVector(planned_lane_id_list);
-					//std::cout << " planned_lane_s_list " << std::endl;
-					//printVector(planned_lane_s_list[0]);
-
+					
 					// - Find whether there is preceding vehicle, set set_speed, accel/decel:
 					bool lane_is_ocupied = false;
 					double check_car_s;
@@ -153,7 +144,7 @@ int main() {
 						}
 					}
 
-					// decide change lane:
+					// - Decide change lane:
 					int do_lane_change = 0;
 					if (lane_is_ocupied && lane_id != 0 && set_speed < lane_change_speed) {
 						// if the planned front region is not occupied in the new lane
@@ -178,21 +169,11 @@ int main() {
 					lane_id += do_lane_change;
 
 
-
-					/*int lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], planned_lane_s_list, sensor_fusion, max_s, yellow_line_d, lane_width);
-					*/
-					//std::cout << "set_speed after checking predecessor  " << set_speed << std::endl;
-
-					// Set acceleration / deceleration for generating future waypoints.
+					// - Set acceleration / deceleration for generating future waypoints.
 					double speed_increment;
-					if (car_speed < 0.5 * set_speed) {
-						ref_accel *= 2.0;
-						speed_increment = ref_accel * (1.0*T);  // 
-					}
-					else {
-						speed_increment = ref_accel * (1.0*T);  // 
-					}
 					double k_accel;
+					speed_increment = ref_accel * (1.0*T);
+					
 					if (ref_speed > set_speed + speed_increment) {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
 						k_accel = -1.0;
@@ -202,7 +183,12 @@ int main() {
 					}
 					else if (ref_speed < set_speed - speed_increment) {
 						ref_speed += speed_increment; // using -5m/s^2 accel
-						k_accel = 1.0;
+						if (ref_speed < 0.5 * set_speed) { // ref_speed very low, need to accelerate fast
+							k_accel = 2.0;
+						}
+						else {
+							k_accel = 1.0;
+						}
 					}
 					else {
 						ref_speed = set_speed;
@@ -212,12 +198,6 @@ int main() {
 						}
 					}
 					ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
-
-					/*std::cout << "lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
-					std::cout << "set_speed " << set_speed << std::endl;
-					std::cout << "ref_speed " << ref_speed << std::endl;*/
-
-
 
 
 					// - Create x and y waypoints:
@@ -231,16 +211,17 @@ int main() {
 					double ref_x;
 					
 					if (previous_length >= 2) {
+						// reuse the previous path in this step
 						for (int i = 0; i < previous_length; i++) {
 							next_x_vals.push_back(previous_path_x[i]);
 							next_y_vals.push_back(previous_path_y[i]);
 						}
-						//std::cout << "Get to the if" << std::endl;
+
+						// Constraint the heading using the last two points in the previous path
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
 						ref_x = previous_path_x[previous_length - 1];
 						double ref_x_prev = previous_path_x[previous_length - 2];
-						//std::cout << ref_x << ' ' << ref_x_prev << std::endl;
 						ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
 						
 						new_car_x_waypoints.push_back(ref_x_prev);
@@ -249,8 +230,7 @@ int main() {
 						new_car_y_waypoints.push_back(ref_y);
 					}
 					else {
-						//std::cout << "Get to the else" << std::endl;
-						// Going one step backwards
+						// Going one step backwards to constraint the heading
 						ref_x = car_x;
 						ref_y = car_y;
 						ref_yaw = car_yaw;
@@ -261,42 +241,26 @@ int main() {
 						new_car_y_waypoints.push_back(car_y);
 					}
 
-					// Push the future points
+					// Push the future waypoints
 					double dist_inc = max_speed * T;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
-					//std::cout << "farthest_sd " << std::endl;
-					//printVector(farthest_sd);
-					/*std::cout << "car_s " << car_s << std::endl;
-					std::cout << "car_d " << car_d << std::endl;
-					std::cout << "car_x " << car_x << std::endl;
-					std::cout << "car_Y " << car_y << std::endl;
-					std::cout << "car_speed " << car_speed * 0.44 << std::endl;
-					std::cout << "car_yaw " << car_yaw << std::endl;  
-					std::cout << "ref_yaw " << ref_yaw << std::endl;*/
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * (i+1);
 						vector<double> new_car_xy = getXY(new_car_s, 
 							std::max(lane_width / 2.0 * 1.1, lane_width/2.0 + (double)lane_id*lane_width),
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
-						// TODO: car_yaw not accurately measured. Need a filter. 
-						/*std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
-						std::cout << "new_car_xy " << new_car_xy[1] << std::endl;*/
 						new_car_x_waypoints.push_back(new_car_xy[0]);
 						new_car_y_waypoints.push_back(new_car_xy[1]);
 					}
 
 
-					// Interpolate waypoints to generate reference trace:
+					// - Interpolate waypoints to generate reference trace:
 					// Transform into car coordinates. 
 					auto new_car_carxy_waypoints = GlobalToCarTransform(new_car_x_waypoints,
 						new_car_y_waypoints, ref_x, ref_y, ref_yaw);
-					/*std::cout << "This is printing new_car_carxy_waypoints[0] : " << std::endl;
-					printVector(new_car_carxy_waypoints[0]);
-					std::cout << "This is printing new_car_carxy_waypoints[1] : " << std::endl;
-					printVector(new_car_carxy_waypoints[1]);*/
-
-					// - Create x and y interpolated reference points:
+					
+					// Create x and y interpolated reference points:
 					tk::spline spline_xy_car;   // this is in car coordinates align with heading
 					spline_xy_car.set_points(new_car_carxy_waypoints[0], new_car_carxy_waypoints[1]);
 					double new_x_car;
@@ -306,6 +270,7 @@ int main() {
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
 					int l = next_x_vals.size();
 					for (int i = 1; i <= T / dT - l; i++) {
+						// Doing interpolation
 						new_x_car = delta_x_car + starting_xy_car[0];
 						new_y_car = spline_xy_car(new_x_car);
 						// Transform back to global coordinates
@@ -316,12 +281,8 @@ int main() {
 							ref_speed += ref_accel * dT;
 						}
 						delta_x_car += ref_speed * dT;
-						//delta_x_car += std::min(set_speed, (ref_speed + id_accel * speed_increment * i)) * dT;
 					}
-					/*std::cout << "This is printing next_x_vals : " << std::endl;
-					printVector(next_x_vals);
-					std::cout << "This is printing next_y_vals : " << std::endl;
-					printVector(next_y_vals);*/
+					
 
 
 					msgJson["next_x"] = next_x_vals;
