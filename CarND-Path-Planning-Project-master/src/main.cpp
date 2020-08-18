@@ -13,7 +13,7 @@
 using nlohmann::json;
 using std::string;
 using std::vector;
-#define PI 3.14159265
+const double Mph2Mps = 0.44704;
 
 int main() {
 	uWS::Hub h;
@@ -116,12 +116,13 @@ int main() {
 					*/
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // time span of the sent trajectory
-					double set_speed = 48.0 * 0.44;     
+					
+					double set_speed = 49.0 * Mph2Mps;
 					double lane_change_speed = set_speed * 0.95;    // [m/s] travel with 50mph
-					double max_speed = 55.0 * 0.44;
+					double max_speed = 55.0 * Mph2Mps;
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
-					double ref_speed = std::max(0.0, car_speed * 0.44);
+					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
 					double ref_accel = 2.0;
 
 
@@ -200,7 +201,7 @@ int main() {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
 						k_accel = -1.0;
 						if (check_car_s - car_s < ref_speed * T) {
-							k_accel -= 0.7 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
+							k_accel -= 1.0* (1.2 - (check_car_s - car_s) / (ref_speed * T));
 						}
 					}
 					else if (ref_speed < set_speed - speed_increment) {
@@ -211,7 +212,7 @@ int main() {
 						ref_speed = set_speed;
 						k_accel = +0.0;
 						if (check_car_s - car_s < ref_speed * T) {
-							k_accel -= 1.0 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
+							k_accel -= 2.0 * (1.0 - (check_car_s - car_s) / (ref_speed * T));
 						}
 					}
 					ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
@@ -243,7 +244,7 @@ int main() {
 						double ref_y_prev = previous_path_y[previous_length - 2];
 						ref_x = previous_path_x[previous_length - 1];
 						double ref_x_prev = previous_path_x[previous_length - 2];
-						std::cout << ref_x << ' ' << ref_x_prev << std::endl;
+						//std::cout << ref_x << ' ' << ref_x_prev << std::endl;
 						ref_yaw = std::atan2(ref_y - ref_y_prev, ref_x - ref_x_prev);
 						
 						new_car_x_waypoints.push_back(ref_x_prev);
@@ -279,7 +280,8 @@ int main() {
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * (i+1);
-						vector<double> new_car_xy = getXY(new_car_s, lane_width/2.0 + (double)lane_id*lane_width,
+						vector<double> new_car_xy = getXY(new_car_s, 
+							std::max(lane_width / 2.0 * 1.1, lane_width/2.0 + (double)lane_id*lane_width),
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						// TODO: car_yaw not accurately measured. Need a filter. 
 						/*std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
