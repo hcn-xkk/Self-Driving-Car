@@ -116,7 +116,9 @@ int main() {
 					*/
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // time span of the sent trajectory
-					double set_speed = 48.0 * 0.44;     // [m/s] travel with 50mph
+					double set_speed = 48.0 * 0.44;     
+					double lane_change_speed = set_speed * 0.9;    // [m/s] travel with 50mph
+					double max_speed = 55.0 * 0.44;
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * 0.44);
@@ -153,6 +155,33 @@ int main() {
 							previous_length = previous_length / 2;
 						}
 					}
+
+					// decide change lane:
+					int do_lane_change = 0;
+					if (lane_is_ocupied && lane_id != 0 && set_speed < lane_change_speed) {
+						// if the planned front region is not occupied in the new lane
+						// want to change to (lane_id-1)
+						double new_lane_speed = set_speed / 0.9;  // Target at traveling with new_lane_speed
+						bool left_lane_is_ocupied = checkVehicleInSegment(lane_id - 1,
+							yellow_line_d, lane_width, dT, car_s - max_speed * T,
+							car_s + new_lane_speed * T, new_lane_speed, sensor_fusion);
+						if (!left_lane_is_ocupied) {
+							do_lane_change = -1;
+						}
+					}
+					else if (lane_is_ocupied && lane_id == 0 && set_speed < lane_change_speed) {
+						double new_lane_speed = set_speed / 0.9;  // Target at traveling with new_lane_speed
+						bool right_lane_is_ocupied = checkVehicleInSegment(lane_id + 1,
+							yellow_line_d, lane_width, dT, car_s - max_speed * T,
+							car_s + new_lane_speed * T, new_lane_speed, sensor_fusion);
+						if (!right_lane_is_ocupied) {
+							do_lane_change = +1;
+						}
+					}
+					lane_id += do_lane_change;
+
+
+
 					/*int lane_is_ocupied = checkLaneEmpty(planned_lane_id_list[0], planned_lane_s_list, sensor_fusion, max_s, yellow_line_d, lane_width);
 					*/
 					//std::cout << "set_speed after checking predecessor  " << set_speed << std::endl;
@@ -189,6 +218,8 @@ int main() {
 					/*std::cout << "lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
 					std::cout << "set_speed " << set_speed << std::endl;
 					std::cout << "ref_speed " << ref_speed << std::endl;*/
+
+
 
 
 					// - Create x and y waypoints:
@@ -233,7 +264,7 @@ int main() {
 					}
 
 					// Push the future points
-					double dist_inc = std::max(15.0, ref_speed) * T*0.5;
+					double dist_inc = max_speed * T;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					//std::cout << "farthest_sd " << std::endl;
 					//printVector(farthest_sd);
