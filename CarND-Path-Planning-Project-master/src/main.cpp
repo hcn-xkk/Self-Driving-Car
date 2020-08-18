@@ -189,8 +189,8 @@ int main() {
 					// Set acceleration / deceleration for generating future waypoints.
 					double speed_increment;
 					if (car_speed < 0.5 * set_speed) {
-						ref_accel *= 3.0;
-						speed_increment = ref_accel * (0.2*T);  // 
+						ref_accel *= 2.0;
+						speed_increment = ref_accel * (0.8*T);  // 
 					}
 					else {
 						speed_increment = ref_accel * (0.2*T);  // 
