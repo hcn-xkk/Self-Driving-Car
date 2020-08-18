@@ -95,27 +95,20 @@ int main() {
 
 					json msgJson;
 
-					vector<double> next_x_vals;
-					vector<double> next_y_vals;
-					
-					/**
-					 * TODO: define a path made up of (x,y) points that the car will visit
-					 *   sequentially every .02 seconds
-					 */
-					 // Try 3 : The last path needs to be smoothened. 
-					
 					/** 
 					------------------------------------------------------------------------
-					Section
-					Create x and y waypoints
+					Generate a path made up of (x,y) points that the car will visit 
+					sequentially every .02 seconds
 					------------------------------------------------------------------------
 					*/
+					vector<double> next_x_vals;
+					vector<double> next_y_vals;
+
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // time span of the sent trajectory
-					
 					double set_speed = 49.0 * Mph2Mps;
-					double lane_change_speed = set_speed * 0.95;    // [m/s] travel with 50mph
-					double max_speed = 55.0 * Mph2Mps;
+					double lane_change_speed = set_speed * 0.95; 
+					double max_speed = 50.0 * Mph2Mps;     // [m/s] max travel speed 50mph
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
@@ -128,48 +121,26 @@ int main() {
 					// - Find length of previous path:
 					int previous_length = previous_path_x.size();
 					
+
 					// - Find whether there is preceding vehicle, set set_speed, accel/decel:
 					bool lane_is_ocupied = false;
-					double check_car_s;
-					check_car_s = car_s + set_speed * T;
-					
+					double check_car_s = car_s + set_speed * T;
 					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
 					lane_is_ocupied = findPredecessorInSegment(lane_id, 
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
-					// std::cout << " lane_is_ocupied " << (int)lane_is_ocupied << std::endl;
-
-					if (lane_is_ocupied) { // re-use a shorter previous path
+					if (lane_is_ocupied) { // Re-use a shorter previous path
 						if (previous_length >=4) {
 							previous_length = previous_length / 2;
 						}
 					}
 
-					// - Decide change lane:
-					int do_lane_change = 0;
-					if (lane_is_ocupied && lane_id != 0 && set_speed < lane_change_speed) {
-						// if the planned front region is not occupied in the new lane
-						// want to change to (lane_id-1)
-						double new_lane_speed = set_speed / 0.9;  // Target at traveling with new_lane_speed
-						bool left_lane_is_ocupied = checkVehicleInSegment(lane_id - 1,
-							yellow_line_d, lane_width, dT, car_s - max_speed * T,
-							car_s + new_lane_speed * T, new_lane_speed, sensor_fusion);
-						if (!left_lane_is_ocupied) {
-							do_lane_change = -1;
-						}
+					// Decide change lane:
+					if (lane_is_ocupied && set_speed < lane_change_speed) {
+						setTargetLane(lane_id, set_speed, car_s, max_speed,
+							yellow_line_d, lane_width, T, dT, sensor_fusion);
 					}
-					else if (lane_is_ocupied && lane_id == 0 && set_speed < lane_change_speed) {
-						double new_lane_speed = set_speed / 0.9;  // Target at traveling with new_lane_speed
-						bool right_lane_is_ocupied = checkVehicleInSegment(lane_id + 1,
-							yellow_line_d, lane_width, dT, car_s - max_speed * T,
-							car_s + new_lane_speed * T, new_lane_speed, sensor_fusion);
-						if (!right_lane_is_ocupied) {
-							do_lane_change = +1;
-						}
-					}
-					lane_id += do_lane_change;
 
-
-					// - Set acceleration / deceleration for generating future waypoints.
+					// Set acceleration / deceleration for generating future waypoints.
 					double distance_to_predecesor = check_car_s - car_s;
 					setACCSpeedAndAcceleration(ref_speed, ref_accel, set_speed, distance_to_predecesor, T);
 					
@@ -180,17 +151,13 @@ int main() {
 
 					// Push the previous_path_x,previous_path_y or current states into waypoints.
 					// This is to have frame-to-frame consistency.
-					double ref_yaw;
-					double ref_y;
-					double ref_x;
-					
+					double ref_yaw, ref_x, ref_y;
 					if (previous_length >= 2) {
-						// reuse the previous path in this step
+						// Reuse the previous path in this step
 						for (int i = 0; i < previous_length; i++) {
 							next_x_vals.push_back(previous_path_x[i]);
 							next_y_vals.push_back(previous_path_y[i]);
 						}
-
 						// Constraint the heading using the last two points in the previous path
 						ref_y = previous_path_y[previous_length - 1];
 						double ref_y_prev = previous_path_y[previous_length - 2];
@@ -216,7 +183,7 @@ int main() {
 					}
 
 					// Push the future waypoints
-					double dist_inc = max_speed * T * 0.8;
+					double dist_inc = max_speed * T * 0.6;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
@@ -235,15 +202,13 @@ int main() {
 						new_car_y_waypoints, ref_x, ref_y, ref_yaw);
 					
 					// Create x and y interpolated reference points:
-					tk::spline spline_xy_car;   // this is in car coordinates align with heading
+					tk::spline spline_xy_car;   // This is in car coordinates align with heading
 					spline_xy_car.set_points(new_car_carxy_waypoints[0], new_car_carxy_waypoints[1]);
-					double new_x_car;
-					double new_y_car;
+					double new_x_car, new_y_car;
 					vector<double> new_xy_global;
 					double delta_x_car = ref_speed * dT;   // Assuming car_yaw does not change much in one horizon
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
-					int l = next_x_vals.size();
-					for (int i = 1; i <= T / dT - l; i++) {
+					for (int i = 1; i <= T / dT - next_x_vals.size(); i++) {
 						// Doing interpolation
 						new_x_car = delta_x_car + starting_xy_car[0];
 						new_y_car = spline_xy_car(new_x_car);
@@ -256,7 +221,7 @@ int main() {
 						}
 						delta_x_car += ref_speed * dT;
 					}
-					
+
 
 					msgJson["next_x"] = next_x_vals;
 					msgJson["next_y"] = next_y_vals;

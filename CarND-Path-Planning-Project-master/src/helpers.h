@@ -225,11 +225,36 @@ void printVector(vector<int> v) {
 
 
 inline int getLaneId(double d, double yellow_line_d, double lane_width) {
-
 	if ((d - yellow_line_d) < lane_width) { return 0; }
 	else if ((d - yellow_line_d) < lane_width * 2) { return 1; }
 	else { return 2; }
+}
 
+
+void setTargetLane(int & lane_id, const double set_speed, const double car_s, const double max_speed, 
+	const double yellow_line_d, const double lane_width,
+	const double T, const double dT, vector<vector<double>> sensor_fusion) {
+
+	if (1 && lane_id != 0) {
+		// If the planned front region is not occupied in the new lane
+		// want to change to (lane_id-1)
+		double new_lane_speed = set_speed / 0.9;  // Target at traveling with new_lane_speed
+		bool left_lane_is_ocupied = checkVehicleInSegment(lane_id - 1,
+			yellow_line_d, lane_width, dT, car_s - max_speed * T,
+			car_s + new_lane_speed * T, new_lane_speed, sensor_fusion);
+		if (!left_lane_is_ocupied) {
+			lane_id -= 1;
+		}
+	}
+	else if (1 && lane_id == 0) {
+		double new_lane_speed = set_speed / 0.9;  // Target at traveling with new_lane_speed
+		bool right_lane_is_ocupied = checkVehicleInSegment(lane_id + 1,
+			yellow_line_d, lane_width, dT, car_s - max_speed * T,
+			car_s + new_lane_speed * T, new_lane_speed, sensor_fusion);
+		if (!right_lane_is_ocupied) {
+			lane_id += 1;
+		}
+	}
 }
 
 
