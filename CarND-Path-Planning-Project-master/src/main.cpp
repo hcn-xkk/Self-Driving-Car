@@ -135,9 +135,13 @@ int main() {
 					}
 
 					// Decide change lane:
+					bool make_lane_change = false;
 					if (lane_is_ocupied && set_speed < lane_change_speed) {
-						setTargetLane(lane_id, set_speed, car_s, max_speed,
+						make_lane_change = setTargetLane(lane_id, set_speed, car_s, max_speed,
 							yellow_line_d, lane_width, T, dT, sensor_fusion);
+						if (make_lane_change) {
+							ref_accel *= 0.8; // If make a lane change, decrease longitudinal acceleration.
+						}
 					}
 
 					// Set acceleration / deceleration for generating future waypoints.
