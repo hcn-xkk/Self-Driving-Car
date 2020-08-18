@@ -232,7 +232,7 @@ int main() {
 					}
 
 					// Push the future points
-					double dist_inc = std::max(20.0, ref_speed) * T*0.5;
+					double dist_inc = std::max(15.0, ref_speed) * T*0.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					//std::cout << "farthest_sd " << std::endl;
 					//printVector(farthest_sd);
