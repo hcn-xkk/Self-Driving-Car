@@ -231,7 +231,53 @@ inline int getLaneId(double d, double yellow_line_d, double lane_width) {
 }
 
 
-void setTargetLane(int & lane_id, const double set_speed, const double car_s, const double max_speed, 
+bool checkVehicleInSegment(int lane_id, double yellow_line_d, double lane_width,
+	double dT, double segment_start, double check_car_s, double check_speed, vector<vector<double>>sensor_fusion) {
+	bool is_ocupied = false;
+	for (int i = 0; i < sensor_fusion.size(); i++) {
+		double check_d = sensor_fusion[i][6];
+		if ((check_d > yellow_line_d + (double)lane_id*lane_width) && (check_d < yellow_line_d + (double)lane_id*lane_width + lane_width)) {
+			double vx = sensor_fusion[i][3];
+			double vy = sensor_fusion[i][4];
+			double v = sqrt(pow(vx, 2) + pow(vy, 2));
+			double prev_check_car_s = sensor_fusion[i][5];
+			double s = prev_check_car_s + dT * v;
+
+			if (((s >= segment_start) && (s < check_car_s))) {
+				is_ocupied = true;
+				return is_ocupied;
+			}
+		}
+	}
+	return is_ocupied;
+}
+
+bool findPredecessorInSegment(int lane_id, double yellow_line_d, double lane_width,
+	double dT, double segment_start, double & check_car_s, double & check_speed, vector<vector<double>>sensor_fusion) {
+	bool is_ocupied = false;
+	for (int i = 0; i < sensor_fusion.size(); i++) {
+		double check_d = sensor_fusion[i][6];
+		if ((check_d > yellow_line_d + (double)lane_id*lane_width) && (check_d < yellow_line_d + (double)lane_id*lane_width + lane_width)) {
+			double vx = sensor_fusion[i][3];
+			double vy = sensor_fusion[i][4];
+			double v = sqrt(pow(vx, 2) + pow(vy, 2));
+			double prev_check_car_s = sensor_fusion[i][5];
+			double s = prev_check_car_s + dT * v;
+			
+			if (((s >= segment_start) && (s < check_car_s))) {
+				is_ocupied = true;
+				if (s < check_car_s) {
+					check_car_s = s;
+					check_speed = v;
+				}
+			}
+		}
+	}
+	return is_ocupied;
+}
+
+
+void setTargetLane(int & lane_id, const double set_speed, const double car_s, const double max_speed,
 	const double yellow_line_d, const double lane_width,
 	const double T, const double dT, vector<vector<double>> sensor_fusion) {
 
@@ -283,58 +329,12 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		ref_speed = set_speed;
 		k_accel = +0.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			k_accel -= 2.0 * (1.0 - std::max(1.0, distance_to_predecesor / (ref_speed * T)) );
+			k_accel -= 2.0 * (1.0 - std::max(1.0, distance_to_predecesor / (ref_speed * T)));
 		}
 	}
 	ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
 }
 
-
-
-bool checkVehicleInSegment(int lane_id, double yellow_line_d, double lane_width,
-	double dT, double segment_start, double check_car_s, double check_speed, vector<vector<double>>sensor_fusion) {
-	bool is_ocupied = false;
-	for (int i = 0; i < sensor_fusion.size(); i++) {
-		double check_d = sensor_fusion[i][6];
-		if ((check_d > yellow_line_d + (double)lane_id*lane_width) && (check_d < yellow_line_d + (double)lane_id*lane_width + lane_width)) {
-			double vx = sensor_fusion[i][3];
-			double vy = sensor_fusion[i][4];
-			double v = sqrt(pow(vx, 2) + pow(vy, 2));
-			double prev_check_car_s = sensor_fusion[i][5];
-			double s = prev_check_car_s + dT * v;
-
-			if (((s >= segment_start) && (s < check_car_s))) {
-				is_ocupied = true;
-				return is_ocupied;
-			}
-		}
-	}
-	return is_ocupied;
-}
-
-bool findPredecessorInSegment(int lane_id, double yellow_line_d, double lane_width,
-	double dT, double segment_start, double & check_car_s, double & check_speed, vector<vector<double>>sensor_fusion) {
-	bool is_ocupied = false;
-	for (int i = 0; i < sensor_fusion.size(); i++) {
-		double check_d = sensor_fusion[i][6];
-		if ((check_d > yellow_line_d + (double)lane_id*lane_width) && (check_d < yellow_line_d + (double)lane_id*lane_width + lane_width)) {
-			double vx = sensor_fusion[i][3];
-			double vy = sensor_fusion[i][4];
-			double v = sqrt(pow(vx, 2) + pow(vy, 2));
-			double prev_check_car_s = sensor_fusion[i][5];
-			double s = prev_check_car_s + dT * v;
-			
-			if (((s >= segment_start) && (s < check_car_s))) {
-				is_ocupied = true;
-				if (s < check_car_s) {
-					check_car_s = s;
-					check_speed = v;
-				}
-			}
-		}
-	}
-	return is_ocupied;
-}
 
 //
 //int checkLaneEmpty(int lane_id, vector<vector<double>> lane_id_s_list, 
