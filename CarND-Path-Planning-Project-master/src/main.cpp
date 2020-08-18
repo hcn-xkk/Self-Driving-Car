@@ -33,7 +33,7 @@ int main() {
 	double yellow_line_d = 0.0;
 
 	std::cout << "here!" << std::endl;
-	auto output = SE2Transform({ 0.0,2.0 }, { 0.0,3.0 }, 1.0, 2.0, 0.25*PI);
+	auto output = SE2Transform({ 0.0,2.0 }, { 0.0,3.0 }, 1.0, 2.0, 0.25*pi());
 	printVector(output[0]);
 
 
