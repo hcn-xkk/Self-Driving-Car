@@ -32,10 +32,6 @@ int main() {
 	double lane_width = 4.0;
 	double yellow_line_d = 0.0;
 
-	std::cout << "here!" << std::endl;
-	auto output = SE2Transform({ 0.0,2.0 }, { 0.0,3.0 }, 1.0, 2.0, 0.25*pi());
-	printVector(output[0]);
-
 
 	std::ifstream in_map_(map_file_.c_str(), std::ifstream::in);
 
@@ -191,17 +187,17 @@ int main() {
 					double speed_increment;
 					if (car_speed < 0.5 * set_speed) {
 						ref_accel *= 2.0;
-						speed_increment = ref_accel * (0.2*T);  // 
+						speed_increment = ref_accel * (1.0*T);  // 
 					}
 					else {
-						speed_increment = ref_accel * (0.2*T);  // 
+						speed_increment = ref_accel * (1.0*T);  // 
 					}
 					double k_accel;
 					if (ref_speed > set_speed + speed_increment) {
 						ref_speed -= speed_increment; // using -5m/s^2 accel
 						k_accel = -1.0;
 						if (check_car_s - car_s < ref_speed * T) {
-							k_accel -= 1.0* (1.2 - (check_car_s - car_s) / (ref_speed * T));
+							k_accel -= 2.0* (1.2 - (check_car_s - car_s) / (ref_speed * T));
 						}
 					}
 					else if (ref_speed < set_speed - speed_increment) {
