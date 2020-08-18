@@ -117,12 +117,12 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // time span of the sent trajectory
 					double set_speed = 48.0 * 0.44;     
-					double lane_change_speed = set_speed * 0.9;    // [m/s] travel with 50mph
+					double lane_change_speed = set_speed * 0.95;    // [m/s] travel with 50mph
 					double max_speed = 55.0 * 0.44;
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * 0.44);
-					double ref_accel = 4.0;
+					double ref_accel = 3.0;
 
 
 					// - Find current lane_id:
@@ -189,7 +189,8 @@ int main() {
 					// Set acceleration / deceleration for generating future waypoints.
 					double speed_increment;
 					if (car_speed < 0.5 * set_speed) {
-						speed_increment = ref_accel * (0.5*T);  // 
+						ref_accel *= 3.0;
+						speed_increment = ref_accel * (0.2*T);  // 
 					}
 					else {
 						speed_increment = ref_accel * (0.2*T);  // 
@@ -257,8 +258,8 @@ int main() {
 						ref_y = car_y;
 						ref_yaw = car_yaw;
 
-						new_car_x_waypoints.push_back(car_x - 1 * cos(car_yaw));
-						new_car_y_waypoints.push_back(car_y - 1 * sin(car_yaw));
+						new_car_x_waypoints.push_back(car_x - 1.0 * cos(car_yaw));
+						new_car_y_waypoints.push_back(car_y - 1.0 * sin(car_yaw));
 						new_car_x_waypoints.push_back(car_x);
 						new_car_y_waypoints.push_back(car_y);
 					}
@@ -278,7 +279,7 @@ int main() {
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * i;
-						vector<double> new_car_xy = getXY(new_car_s, 2.0 + (double)lane_id*4.0,
+						vector<double> new_car_xy = getXY(new_car_s, lane_width/2.0 + (double)lane_id*lane_width,
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						// TODO: car_yaw not accurately measured. Need a filter. 
 						/*std::cout << "new_car_xy " << new_car_xy[0] << std::endl;
