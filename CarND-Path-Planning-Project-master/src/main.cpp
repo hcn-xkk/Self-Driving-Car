@@ -105,7 +105,7 @@ int main() {
 					vector<double> next_y_vals;
 
 					double dT = 0.02;   // delta for the sent out trajectories
-					double T = 1.0;     // time span of the sent trajectory
+					double T = 1.5;     // time span of the sent trajectory
 					double set_speed = 49.0 * Mph2Mps;
 					double lane_change_speed = set_speed * 0.95; 
 					double max_speed = 50.0 * Mph2Mps;     // [m/s] max travel speed 50mph
@@ -130,7 +130,7 @@ int main() {
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
 					if (lane_is_ocupied) { // Re-use a shorter previous path
 						if (previous_length >=4) {
-							previous_length = previous_length / 2;
+							previous_length = (int)(previous_length / 1.5);
 						}
 					}
 
@@ -187,7 +187,7 @@ int main() {
 					}
 
 					// Push the future waypoints
-					double dist_inc = max_speed * T * 0.6;
+					double dist_inc = max_speed * T * 0.9;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
