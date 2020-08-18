@@ -122,6 +122,7 @@ int main() {
 					double ref_speed = std::max(0.0, car_speed * 0.44);
 					double ref_accel = 4.0;
 
+
 					// - Find current lane_id:
 					int lane_id = getLaneId(car_d, yellow_line_d, lane_width);
 					
@@ -255,6 +256,7 @@ int main() {
 						new_car_y_waypoints.push_back(new_car_xy[1]);
 					}
 
+
 					// Interpolate waypoints to generate reference trace:
 					// Transform into car coordinates. 
 					auto new_car_carxy_waypoints = GlobalToCarTransform(new_car_x_waypoints,
@@ -290,9 +292,6 @@ int main() {
 					printVector(next_x_vals);
 					std::cout << "This is printing next_y_vals : " << std::endl;
 					printVector(next_y_vals);*/
-
-
-
 
 
 					msgJson["next_x"] = next_x_vals;
