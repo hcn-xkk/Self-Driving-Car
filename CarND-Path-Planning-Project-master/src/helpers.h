@@ -233,6 +233,37 @@ inline int getLaneId(double d, double yellow_line_d, double lane_width) {
 }
 
 
+void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
+	const double set_speed, const double distance_to_predecesor, const double T) {
+
+	double speed_increment = ref_accel * (1.0*T);
+	double k_accel;
+	if (ref_speed > set_speed + speed_increment) {
+		ref_speed -= speed_increment; // using -5m/s^2 accel
+		k_accel = -1.0;
+		if (distance_to_predecesor < ref_speed * T) {
+			k_accel -= 2.0* (1.2 - (check_car_s - car_s) / (ref_speed * T));
+		}
+	}
+	else if (ref_speed < set_speed - speed_increment) {
+		ref_speed += speed_increment; // using -5m/s^2 accel
+		if (ref_speed < 0.5 * set_speed) { // ref_speed very low, need to accelerate fast
+			k_accel = 2.0;
+		}
+		else {
+			k_accel = 1.0;
+		}
+	}
+	else {
+		ref_speed = set_speed;
+		k_accel = +0.0;
+		if (distance_to_predecesor < ref_speed * T) {
+			k_accel -= 2.0 * (1.0 - std::max(1.0, distance_to_predecesor / (ref_speed * T)) );
+		}
+	}
+	ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
+}
+
 
 
 bool checkVehicleInSegment(int lane_id, double yellow_line_d, double lane_width,
