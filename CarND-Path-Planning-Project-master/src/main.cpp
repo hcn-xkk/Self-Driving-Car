@@ -233,6 +233,7 @@ int main() {
 						// Doing interpolation
 						new_x_car = delta_x_car + starting_xy_car[0];
 						new_y_car = spline_xy_car(new_x_car);
+						std::cout << "new_x_car " << new_x_car << std::endl;
 						// Transform back to global coordinates
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
