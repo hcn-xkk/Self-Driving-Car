@@ -152,6 +152,8 @@ int main() {
 						double y2 = previous_path_y[previous_length - 2];
 
 						ref_speed = sqrt(((x1-x2)/dT)*((x1 - x2) / dT) + ((y1 - y2) / dT)*((y1 - y2) / dT));
+						std::cout << "ref_speed" << ref_speed << std::endl;
+						ref_speed = set_speed;
 					}
 
 
