@@ -282,6 +282,7 @@ int main() {
 							else {
 								ref_speed = set_speed;
 							}
+						}
 						else {
 							ref_speed = set_speed;
 						}
