@@ -125,6 +125,7 @@ int main() {
 					// - Find whether there is preceding vehicle, set set_speed, accel/decel:
 					bool lane_is_ocupied = false;
 					double check_car_s = car_s + set_speed * T*2.0;
+					int old_lane_id = lane_id;
 					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
 					lane_is_ocupied = findPredecessorInSegment(lane_id, 
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
@@ -209,9 +210,16 @@ int main() {
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * ((double)i+0.0);
-						vector<double> new_car_xy = getXY(new_car_s, 
-							std::max(lane_width / 2.0 * 1.00, lane_width/2.0 + (double)lane_id*lane_width),
-							map_waypoints_s, map_waypoints_x, map_waypoints_y);
+						if (!make_lane_change) {
+							vector<double> new_car_xy = getXY(new_car_s,
+								lane_width / 2.0 + (double)lane_id*lane_width,
+								map_waypoints_s, map_waypoints_x, map_waypoints_y);
+						}
+						else {
+							vector<double> new_car_xy = getXY(new_car_s,
+								lane_width / 2.0 + ((double)lane_id*0.8 + (double)old_lane_id*0.2)*lane_width,
+								map_waypoints_s, map_waypoints_x, map_waypoints_y);
+						}
 						new_car_x_waypoints.push_back(new_car_xy[0]);
 						new_car_y_waypoints.push_back(new_car_xy[1]);
 					}
