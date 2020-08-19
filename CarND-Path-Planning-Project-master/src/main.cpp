@@ -124,13 +124,13 @@ int main() {
 
 					// - Find whether there is preceding vehicle, set set_speed, accel/decel:
 					bool lane_is_ocupied = false;
-					double check_car_s = car_s + set_speed * T*1.5;
+					double check_car_s = car_s + set_speed * T*2.0;
 					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
 					lane_is_ocupied = findPredecessorInSegment(lane_id, 
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
 					if (lane_is_ocupied) { // Re-use a shorter previous path
 						if (previous_length >=4) {
-							previous_length = (int)(previous_length / 1.5);
+							previous_length = (int)(previous_length *0.8);
 						}
 					}
 
