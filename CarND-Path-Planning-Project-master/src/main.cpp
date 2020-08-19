@@ -239,6 +239,7 @@ int main() {
 					double delta_x_car = std::max(10.0,ref_speed) * dT ;   // Assuming car_yaw does not change much in one horizon
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
 					double x0_car = starting_xy_car[0];
+					vector<double> help_debug_x, help_debug_y, help_debug_v;
 					for (int i = 1; i <= T / dT - next_x_vals.size(); i++) {
 						// Doing interpolation
 						double theta = atan2(spline_xy_car(x0_car + 0.01) - spline_xy_car(x0_car),
@@ -248,6 +249,12 @@ int main() {
 
 						std::cout << "new_x_car " << new_x_car << std::endl;
 						std::cout << "new_y_car " << new_y_car << std::endl;
+
+						help_debug_x.push_back(new_x_car);
+						help_debug_y.push_back(new_y_car);
+						help_debug_v.push_back(ref_speed);
+
+
 						// Transform back to global coordinates
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
@@ -276,11 +283,16 @@ int main() {
 						}
 						delta_x_car = ref_speed * dT;
 						x0_car = new_x_car;
+						
+
 					}
-					if (make_lane_change) {
+					if (true) {
 						printVector(next_x_vals);
 						printVector(next_y_vals);
-
+						printVector(help_debug_x);
+						printVector(help_debug_y);
+						printVector(help_debug_v);
+						
 					}
 
 					msgJson["next_x"] = next_x_vals;
