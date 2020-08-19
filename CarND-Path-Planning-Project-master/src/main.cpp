@@ -112,7 +112,7 @@ int main() {
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
-					double ref_accel = 8.0;
+					double ref_accel = 5.0;
 
 
 					// - Find current lane_id:
@@ -164,6 +164,7 @@ int main() {
 					setACCSpeedAndAcceleration(ref_speed, ref_accel, set_speed, distance_to_predecesor, T);
 					std::cout << "ref_speed 2 " << ref_speed << std::endl;
 					std::cout << "set_speed 2 " << set_speed << std::endl;
+					std::cout << "ref_accel 2 " << ref_accel << std::endl;
 
 					// - Create x and y waypoints:
 					vector<double> new_car_x_waypoints;
