@@ -220,7 +220,13 @@ int main() {
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
 						next_y_vals.push_back(new_xy_global[1]);
-						if (fabs(ref_speed - set_speed) > fabs(ref_accel) * dT) {
+						//if (fabs(ref_speed - set_speed) > fabs(ref_accel) * dT) {
+						//	ref_speed += 0.224;// ref_accel * dT;
+						//}
+						if ((ref_speed - set_speed) > 0.224) {
+							ref_speed -= 0.224;// ref_accel * dT;
+						}
+						else if ((ref_speed - set_speed) < -0.224) {
 							ref_speed += 0.224;// ref_accel * dT;
 						}
 						delta_x_car += ref_speed * dT;
