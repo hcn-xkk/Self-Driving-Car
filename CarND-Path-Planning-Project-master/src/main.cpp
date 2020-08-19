@@ -112,7 +112,7 @@ int main() {
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
-					double ref_accel = 2.0;
+					double ref_accel = 1.5;
 
 
 					// - Find current lane_id:
@@ -204,7 +204,7 @@ int main() {
 					}
 
 					// Push the future waypoints
-					double dist_inc = max_speed * T * 0.6;
+					double dist_inc = max_speed * T * 1.2;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
@@ -229,11 +229,16 @@ int main() {
 					vector<double> new_xy_global;
 					double delta_x_car = std::max(10.0,ref_speed) * dT ;   // Assuming car_yaw does not change much in one horizon
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
+					double x0_car = starting_xy_car[0];
 					for (int i = 1; i <= T / dT - next_x_vals.size(); i++) {
 						// Doing interpolation
-						new_x_car = delta_x_car + starting_xy_car[0];
+						double theta = atan2(spline_xy_car(x0_car + 0.01) - spline_xy_car(x0_car),
+							0.01);
+						new_x_car = delta_x_car*cos(theta) + x0_car;
 						new_y_car = spline_xy_car(new_x_car);
+
 						std::cout << "new_x_car " << new_x_car << std::endl;
+						std::cout << "new_y_car " << new_y_car << std::endl;
 						// Transform back to global coordinates
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
@@ -260,7 +265,8 @@ int main() {
 						else {
 							ref_speed = set_speed;
 						}
-						delta_x_car += ref_speed * dT;
+						delta_x_car = ref_speed * dT;
+						x0_car = new_x_car;
 					}
 
 
