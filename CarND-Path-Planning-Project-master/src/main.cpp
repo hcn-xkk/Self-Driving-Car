@@ -271,7 +271,7 @@ int main() {
 							}
 						}
 						else if (ref_accel > 0) {
-							if ((ref_speed - set_speed) > fabs(ref_accel * dT)) {
+							if ((- ref_speed + set_speed) > fabs(ref_accel * dT)) {
 								ref_speed += ref_accel * dT; //  0.224;// ref_accel * dT;
 							}
 							else {
@@ -287,6 +287,7 @@ int main() {
 
 					}
 					if (true) {
+						std::cout << "Previous length " << previous_length << std::endl;
 						printVector(next_x_vals);
 						printVector(next_y_vals);
 						printVector(help_debug_x);
