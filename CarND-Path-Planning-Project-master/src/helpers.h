@@ -316,7 +316,7 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		ref_speed -= speed_increment; // using -5m/s^2 accel
 		k_accel = -1.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			k_accel -= 2.0* (1.2 - (distance_to_predecesor) / (ref_speed * T));
+			k_accel -= 1.5* (1.5 - (distance_to_predecesor) / (ref_speed * T));
 		}
 	}
 	else if (ref_speed < set_speed - speed_increment) {
@@ -332,7 +332,7 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		ref_speed = set_speed;
 		k_accel = +0.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			k_accel -= 2.0 * (1.2 - std::max(1.0, distance_to_predecesor / (ref_speed * T)));
+			k_accel -= 1.5 * (1.5 - std::max(1.0, distance_to_predecesor / (ref_speed * T)));
 		}
 	}
 	ref_accel *= k_accel;   // update ref_accel for generating future waypoints.

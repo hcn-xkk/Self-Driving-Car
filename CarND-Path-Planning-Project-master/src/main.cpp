@@ -130,7 +130,7 @@ int main() {
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
 					if (lane_is_ocupied) { // Re-use a shorter previous path
 						if (previous_length >=4) {
-							previous_length = (int)(previous_length / 1.5);
+							previous_length = (int)(previous_length / 1);
 						}
 					}
 
@@ -187,13 +187,13 @@ int main() {
 					}
 
 					// Push the future waypoints
-					double dist_inc = max_speed * T * 0.9;
+					double dist_inc = max_speed * T * 0.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
-						new_car_s = farthest_sd[0] + dist_inc * ((double)i+0.5);
+						new_car_s = farthest_sd[0] + dist_inc * ((double)i+1.0);
 						vector<double> new_car_xy = getXY(new_car_s, 
-							std::max(lane_width / 2.0 * 1.1, lane_width/2.0 + (double)lane_id*lane_width),
+							std::max(lane_width / 2.0 * 1.05, lane_width/2.0 + (double)lane_id*lane_width),
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						new_car_x_waypoints.push_back(new_car_xy[0]);
 						new_car_y_waypoints.push_back(new_car_xy[1]);
