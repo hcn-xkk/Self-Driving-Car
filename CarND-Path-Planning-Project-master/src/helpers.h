@@ -336,6 +336,8 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 			k_accel = -2.0; // 1.2 * (1.2 - std::max(1.0, distance_to_predecesor / (ref_speed * T)));
 		}
 	}
+	std::cout << "k_accel " << k_accel << std::endl;
+
 	ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
 }
 
