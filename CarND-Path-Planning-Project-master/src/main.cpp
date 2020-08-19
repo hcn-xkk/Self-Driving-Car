@@ -112,7 +112,7 @@ int main() {
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
-					double ref_accel = 5.0;
+					double ref_accel = 10.0;
 
 
 					// - Find current lane_id:
