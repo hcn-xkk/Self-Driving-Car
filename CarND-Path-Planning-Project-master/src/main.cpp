@@ -241,7 +241,7 @@ int main() {
 						//	ref_speed += 0.224;// ref_accel * dT;
 						//}
 						if ((ref_speed - set_speed) > ref_accel * dT) {
-							ref_speed -= ref_accel * dT; //0.224;// ref_accel * dT;
+							ref_speed = ref_accel * dT; //0.224;// ref_accel * dT;
 						}
 						else if ((ref_speed - set_speed) < ref_accel * dT) {
 							ref_speed += ref_accel * dT; //  0.224;// ref_accel * dT;
