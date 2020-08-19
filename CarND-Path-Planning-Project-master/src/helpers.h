@@ -308,16 +308,17 @@ bool setTargetLane(int & lane_id, const double set_speed, const double car_s, co
 
 
 void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
-	const double set_speed, const double distance_to_predecesor, const double T) {
+	double & set_speed, const double distance_to_predecesor, const double T) {
 
 	double speed_increment = 0.224; // ref_accel * (1.0*T);
 	double k_accel;
 	if (ref_speed > set_speed + speed_increment) {
 		ref_speed -= speed_increment; // using -5m/s^2 accel
 		k_accel = -2.0;
-		/*if (distance_to_predecesor < ref_speed * T) {
-			k_accel -= 1.2* (1.2 - (distance_to_predecesor) / (ref_speed * T));
-		}*/
+		if (distance_to_predecesor < ref_speed * T) {
+			set_speed = set_speed * 0.9;
+			// k_accel -= 1.2* (1.2 - (distance_to_predecesor) / (ref_speed * T));
+		}
 	}
 	else if (ref_speed < set_speed - speed_increment) {
 		ref_speed += speed_increment; // using -5m/s^2 accel
