@@ -247,9 +247,6 @@ int main() {
 						new_x_car = delta_x_car*cos(theta) + x0_car;
 						new_y_car = spline_xy_car(new_x_car);
 
-						std::cout << "new_x_car " << new_x_car << std::endl;
-						std::cout << "new_y_car " << new_y_car << std::endl;
-
 						help_debug_x.push_back(new_x_car);
 						help_debug_y.push_back(new_y_car);
 						help_debug_v.push_back(ref_speed);
@@ -262,22 +259,29 @@ int main() {
 						//if (fabs(ref_speed - set_speed) > fabs(ref_accel) * dT) {
 						//	ref_speed += 0.224;// ref_accel * dT;
 						//}
-						if (ref_accel < 0) {
-							if ((ref_speed - set_speed) > fabs(ref_accel * dT)) {
+						//if (ref_accel < 0) {
+						//	if ((ref_speed - set_speed) > fabs(ref_accel * dT)) {
+						//		ref_speed += ref_accel * dT; //0.224;// ref_accel * dT;
+						//	}
+						//	else {
+						//		ref_speed = set_speed;
+						//	}
+						//}
+						//else if (ref_accel > 0) {
+						//	if ((set_speed - ref_speed) > fabs(ref_accel * dT)) {
+						//		ref_speed += ref_accel * dT; //  0.224;// ref_accel * dT;
+						//	}
+						//	else {
+						//		ref_speed = set_speed;
+						//	}
+						//}
+						if (fabs(ref_accel) > 1e-3) {
+							if (fabs(ref_speed - set_speed) > fabs(ref_accel * dT)) {
 								ref_speed += ref_accel * dT; //0.224;// ref_accel * dT;
 							}
 							else {
 								ref_speed = set_speed;
 							}
-						}
-						else if (ref_accel > 0) {
-							if ((- ref_speed + set_speed) > fabs(ref_accel * dT)) {
-								ref_speed += ref_accel * dT; //  0.224;// ref_accel * dT;
-							}
-							else {
-								ref_speed = set_speed;
-							}
-						}
 						else {
 							ref_speed = set_speed;
 						}
