@@ -112,7 +112,7 @@ int main() {
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
-					double ref_accel = 2.0;
+					double ref_accel = 8.0;
 
 
 					// - Find current lane_id:
@@ -140,7 +140,7 @@ int main() {
 						make_lane_change = setTargetLane(lane_id, set_speed, car_s, max_speed,
 							yellow_line_d, lane_width, T, dT, sensor_fusion);
 						if (make_lane_change) {
-							ref_accel *= 0.8; // If make a lane change, decrease longitudinal acceleration.
+							ref_accel *= 1.0; // If make a lane change, decrease longitudinal acceleration.
 						}
 					}
 
