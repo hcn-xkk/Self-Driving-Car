@@ -65,6 +65,24 @@ the path has processed since last time.
 
 2. There will be some latency between the simulator running and the path planner returning a path, with optimized code usually its not very long maybe just 1-3 time steps. During this delay the simulator will continue using points that it was last given, because of this its a good idea to store the last points you have used so you can have a smooth transition. previous_path_x, and previous_path_y can be helpful for this transition since they show the last points given to the simulator controller with the processed points already removed. You would either return a path that extends this previous path or make sure to create a new path that has a smooth transition with this last path.
 
+### Implementation details
+
+The generated path from this path planner is stored in the variables `next_x_vals`, `next_y_vals` in `main.cpp`. A future path for the next `T` seconds is generated for the perfect controller to follow. 
+
+The logic for designing the path is the following:
+
+1. We want the new path to keep the current heading and speed as much as possible. If there exists a previous path, then we want to re-use the previous path. If there does not exist a previous path, e.g. the initialization part, the current vehicle states are used to generate a virtual previous path.  
+
+2. We examine whether the previous path can be used. This is done by checking whether there is another vehicle (predecessor) is traveling in front of the ego vehicle. If there is a predecessor, then we record the speed and position of the predecessor. This information will be useful later when we decide the motion (target speed and target acceleration) of the ego. 
+
+3. We decide whether a lane change is needed. Lane change will only be requested if there is a slow moving predecessor. If ego is not in the left-most lane, then it will only change to its left lane. If the ego is already in the left-most lane, it will change to the right lane to pass the front vehicle. 
+
+4. Target speed and acceleration for the ego vehicle is decided. They will be dependent on (1) whether a lane change is requested, (2) what is the target driving speed, and if there is a predecessor vehicle, how much is the following distance.
+
+5. A new reference path will be generated based on the target speed and acceleration, and will be appended to the previous path.
+
+
+
 ## Tips
 
 A really helpful resource for doing this project and creating smooth trajectories was using http://kluge.in-chemnitz.de/opensource/spline/, the spline function is in a single hearder file is really easy to use.
