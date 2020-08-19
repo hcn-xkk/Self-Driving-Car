@@ -112,7 +112,7 @@ int main() {
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
-					double ref_accel = 8.0;
+					double ref_accel = 5.0;
 
 
 					// - Find current lane_id:
@@ -124,7 +124,7 @@ int main() {
 
 					// - Find whether there is preceding vehicle, set set_speed, accel/decel:
 					bool lane_is_ocupied = false;
-					double check_car_s = car_s + set_speed * T;
+					double check_car_s = car_s + set_speed * T*1.5;
 					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
 					lane_is_ocupied = findPredecessorInSegment(lane_id, 
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
@@ -140,7 +140,7 @@ int main() {
 						make_lane_change = setTargetLane(lane_id, set_speed, car_s, max_speed,
 							yellow_line_d, lane_width, T, dT, sensor_fusion);
 						if (make_lane_change) {
-							ref_accel *= 0.0; // If make a lane change, decrease longitudinal acceleration.
+							ref_accel *= 0.5; // If make a lane change, decrease longitudinal acceleration.
 						}
 					}
 
@@ -223,11 +223,11 @@ int main() {
 						//if (fabs(ref_speed - set_speed) > fabs(ref_accel) * dT) {
 						//	ref_speed += 0.224;// ref_accel * dT;
 						//}
-						if ((ref_speed - set_speed) > 0.224) {
-							ref_speed -= 0.224;// ref_accel * dT;
+						if ((ref_speed - set_speed) > ref_accel * dT) {
+							ref_speed -= ref_accel * dT; //0.224;// ref_accel * dT;
 						}
-						else if ((ref_speed - set_speed) < -0.224) {
-							ref_speed += 0.224;// ref_accel * dT;
+						else if ((ref_speed - set_speed) < ref_accel * dT) {
+							ref_speed += ref_accel * dT; //  0.224;// ref_accel * dT;
 						}
 						delta_x_car += ref_speed * dT;
 					}
