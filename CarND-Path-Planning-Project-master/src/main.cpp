@@ -141,7 +141,7 @@ int main() {
 						make_lane_change = setTargetLane(lane_id, set_speed, car_s, max_speed,
 							yellow_line_d, lane_width, T, dT, sensor_fusion);
 						if (make_lane_change) {
-							ref_accel *= 0.5; // If make a lane change, decrease longitudinal acceleration.
+							ref_accel *= 0.8; // If make a lane change, decrease longitudinal acceleration.
 						}
 					}
 

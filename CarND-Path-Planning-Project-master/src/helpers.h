@@ -284,20 +284,20 @@ bool setTargetLane(int & lane_id, const double set_speed, const double car_s, co
 	if (1 && lane_id != 0) {
 		// If the planned front region is not occupied in the new lane
 		// want to change to (lane_id-1)
-		double new_lane_speed = set_speed / 0.9;  // Target at traveling with new_lane_speed
+		double new_lane_speed = set_speed / 0.8;  // Target at traveling with new_lane_speed
 		bool left_lane_is_ocupied = checkVehicleInSegment(lane_id - 1,
 			yellow_line_d, lane_width, dT, car_s - max_speed * T,
-			car_s + new_lane_speed * T, new_lane_speed, sensor_fusion);
+			car_s + new_lane_speed * T * 2, new_lane_speed, sensor_fusion);
 		if (!left_lane_is_ocupied) {
 			lane_id -= 1;
 			return true;
 		}
 	}
 	else {
-		double new_lane_speed = set_speed / 0.9;  // Target at traveling with new_lane_speed
+		double new_lane_speed = set_speed / 0.8;  // Target at traveling with new_lane_speed
 		bool right_lane_is_ocupied = checkVehicleInSegment(lane_id + 1,
 			yellow_line_d, lane_width, dT, car_s - max_speed * T,
-			car_s + new_lane_speed * T, new_lane_speed, sensor_fusion);
+			car_s + new_lane_speed * T * 2, new_lane_speed, sensor_fusion);
 		if (!right_lane_is_ocupied) {
 			lane_id += 1;
 			return true;
