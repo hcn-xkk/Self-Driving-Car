@@ -210,13 +210,14 @@ int main() {
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * ((double)i+0.0);
+						vector<double> new_car_xy;
 						if (!make_lane_change) {
-							vector<double> new_car_xy = getXY(new_car_s,
+							new_car_xy = getXY(new_car_s,
 								lane_width / 2.0 + (double)lane_id*lane_width,
 								map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						}
 						else {
-							vector<double> new_car_xy = getXY(new_car_s,
+							new_car_xy = getXY(new_car_s,
 								lane_width / 2.0 + ((double)lane_id*0.8 + (double)old_lane_id*0.2)*lane_width,
 								map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						}
