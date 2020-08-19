@@ -131,7 +131,7 @@ int main() {
 						yellow_line_d, lane_width, dT, car_s, check_car_s, set_speed, sensor_fusion);
 					if (lane_is_ocupied) { // Re-use a shorter previous path
 						if (previous_length >=4) {
-							previous_length = (int)(previous_length *1);
+							previous_length = (int)(previous_length *0.5);
 						}
 					}
 
