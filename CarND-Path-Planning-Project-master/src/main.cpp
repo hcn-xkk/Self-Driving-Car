@@ -221,7 +221,7 @@ int main() {
 						next_x_vals.push_back(new_xy_global[0]);
 						next_y_vals.push_back(new_xy_global[1]);
 						if (fabs(ref_speed - set_speed) > fabs(ref_accel) * dT) {
-							ref_speed += ref_accel * dT;
+							ref_speed += 0.224;// ref_accel * dT;
 						}
 						delta_x_car += ref_speed * dT;
 					}
