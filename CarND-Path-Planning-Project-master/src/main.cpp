@@ -107,7 +107,7 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // time span of the sent trajectory
 					double set_speed = 45.0 * Mph2Mps;
-					double lane_change_speed = set_speed * 1.95; 
+					double lane_change_speed = set_speed * 0.85; 
 					double max_speed = 50.0 * Mph2Mps;     // [m/s] max travel speed 50mph
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
@@ -138,7 +138,7 @@ int main() {
 					
 					// Decide change lane:
 					bool make_lane_change = false;
-					if (true && set_speed < lane_change_speed) { //
+					if (lane_is_ocupied && set_speed < lane_change_speed) { //
 						make_lane_change = setTargetLane(lane_id, set_speed, car_s, max_speed,
 							yellow_line_d, lane_width, T, dT, sensor_fusion);
 						if (make_lane_change) {
