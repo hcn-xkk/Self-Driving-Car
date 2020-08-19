@@ -140,7 +140,7 @@ int main() {
 						make_lane_change = setTargetLane(lane_id, set_speed, car_s, max_speed,
 							yellow_line_d, lane_width, T, dT, sensor_fusion);
 						if (make_lane_change) {
-							ref_accel *= 1.0; // If make a lane change, decrease longitudinal acceleration.
+							ref_accel *= 0.0; // If make a lane change, decrease longitudinal acceleration.
 						}
 					}
 
@@ -187,13 +187,13 @@ int main() {
 					}
 
 					// Push the future waypoints
-					double dist_inc = max_speed * T * 1.0;
+					double dist_inc = max_speed * T * 1.5;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * ((double)i+0.0);
 						vector<double> new_car_xy = getXY(new_car_s, 
-							std::max(lane_width / 2.0 * 1.05, lane_width/2.0 + (double)lane_id*lane_width),
+							std::max(lane_width / 2.0 * 1.00, lane_width/2.0 + (double)lane_id*lane_width),
 							map_waypoints_s, map_waypoints_x, map_waypoints_y);
 						new_car_x_waypoints.push_back(new_car_xy[0]);
 						new_car_y_waypoints.push_back(new_car_xy[1]);
@@ -210,7 +210,7 @@ int main() {
 					spline_xy_car.set_points(new_car_carxy_waypoints[0], new_car_carxy_waypoints[1]);
 					double new_x_car, new_y_car;
 					vector<double> new_xy_global;
-					double delta_x_car = ref_speed * dT;   // Assuming car_yaw does not change much in one horizon
+					double delta_x_car = std::max(15.0,ref_speed) * dT;   // Assuming car_yaw does not change much in one horizon
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
 					for (int i = 1; i <= T / dT - next_x_vals.size(); i++) {
 						// Doing interpolation
