@@ -226,7 +226,7 @@ int main() {
 					spline_xy_car.set_points(new_car_carxy_waypoints[0], new_car_carxy_waypoints[1]);
 					double new_x_car, new_y_car;
 					vector<double> new_xy_global;
-					double delta_x_car = std::max(10.0,ref_speed) * dT *0.6;   // Assuming car_yaw does not change much in one horizon
+					double delta_x_car = std::max(10.0,ref_speed) * dT ;   // Assuming car_yaw does not change much in one horizon
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
 					for (int i = 1; i <= T / dT - next_x_vals.size(); i++) {
 						// Doing interpolation
@@ -245,7 +245,7 @@ int main() {
 						else if ((ref_speed - set_speed) < ref_accel * dT) {
 							ref_speed += ref_accel * dT; //  0.224;// ref_accel * dT;
 						}
-						delta_x_car += ref_speed * dT*0.6;
+						delta_x_car += ref_speed * dT;
 					}
 
 
