@@ -155,7 +155,7 @@ int main() {
 						std::cout << "ref_speed " << ref_speed << std::endl;
 						std::cout << "set_speed " << set_speed << std::endl;
 
-						ref_speed = set_speed;
+						//ref_speed = set_speed;
 					}
 
 
