@@ -134,6 +134,7 @@ int main() {
 						}
 					}
 
+					
 					// Decide change lane:
 					bool make_lane_change = false;
 					if (lane_is_ocupied && set_speed < lane_change_speed) {
@@ -143,6 +144,13 @@ int main() {
 							ref_accel *= 0.5; // If make a lane change, decrease longitudinal acceleration.
 						}
 					}
+
+					if (previous_length >= 2) {
+						double vx = previous_path_x[previous_length - 1] - previous_path_x[previous_length - 2];
+						double vy = previous_path_y[previous_length - 1] - previous_path_y[previous_length - 2];
+						ref_speed = sqrt(vx*vx + vy * vy);
+					}
+
 
 					// Set acceleration / deceleration for generating future waypoints.
 					double distance_to_predecesor = check_car_s - car_s;
