@@ -107,12 +107,12 @@ int main() {
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // time span of the sent trajectory
 					double set_speed = 45.0 * Mph2Mps;
-					double lane_change_speed = set_speed * 0.99; 
+					double lane_change_speed = set_speed * 0.95; 
 					double max_speed = 50.0 * Mph2Mps;     // [m/s] max travel speed 50mph
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
-					double ref_accel = 5.0;
+					double ref_accel = 3.0;
 
 
 					// - Find current lane_id:
