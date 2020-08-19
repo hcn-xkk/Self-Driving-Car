@@ -152,7 +152,9 @@ int main() {
 						double y2 = previous_path_y[previous_length - 2];
 
 						ref_speed = sqrt(((x1-x2)/dT)*((x1 - x2) / dT) + ((y1 - y2) / dT)*((y1 - y2) / dT));
-						std::cout << "ref_speed" << ref_speed << std::endl;
+						std::cout << "ref_speed " << ref_speed << std::endl;
+						std::cout << "set_speed " << set_speed << std::endl;
+
 						ref_speed = set_speed;
 					}
 
@@ -160,7 +162,8 @@ int main() {
 					// Set acceleration / deceleration for generating future waypoints.
 					double distance_to_predecesor = check_car_s - car_s;
 					setACCSpeedAndAcceleration(ref_speed, ref_accel, set_speed, distance_to_predecesor, T);
-					
+					std::cout << "ref_speed 2 " << ref_speed << std::endl;
+					std::cout << "set_speed 2 " << set_speed << std::endl;
 
 					// - Create x and y waypoints:
 					vector<double> new_car_x_waypoints;
