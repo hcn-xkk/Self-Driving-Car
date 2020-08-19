@@ -240,11 +240,21 @@ int main() {
 						//if (fabs(ref_speed - set_speed) > fabs(ref_accel) * dT) {
 						//	ref_speed += 0.224;// ref_accel * dT;
 						//}
-						if ((ref_speed - set_speed) > ref_accel * dT) {
-							ref_speed -= ref_accel * dT; //0.224;// ref_accel * dT;
+						if (ref_accel < 0) {
+							if ((ref_speed - set_speed) > fabs(ref_accel * dT)) {
+								ref_speed += ref_accel * dT; //0.224;// ref_accel * dT;
+							}
+							else {
+								ref_speed = set_speed;
+							}
 						}
-						else if ((ref_speed - set_speed) < ref_accel * dT) {
-							ref_speed += ref_accel * dT; //  0.224;// ref_accel * dT;
+						else if (ref_accel > 0) {
+							if ((ref_speed - set_speed) > fabs(ref_accel * dT)) {
+								ref_speed += ref_accel * dT; //  0.224;// ref_accel * dT;
+							}
+							else {
+								ref_speed = set_speed;
+							}
 						}
 						else {
 							ref_speed = set_speed;
