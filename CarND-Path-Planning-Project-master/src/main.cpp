@@ -206,7 +206,7 @@ int main() {
 					// Push the future waypoints
 					double dist_inc = max_speed * T * 0.6;
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
-					for (int i = 2; i <= 3; i++) {
+					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
 						new_car_s = farthest_sd[0] + dist_inc * ((double)i+0.0);
 						vector<double> new_car_xy = getXY(new_car_s, 
