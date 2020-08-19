@@ -106,8 +106,8 @@ int main() {
 
 					double dT = 0.02;   // delta for the sent out trajectories
 					double T = 1.0;     // time span of the sent trajectory
-					double set_speed = 49.0 * Mph2Mps;
-					double lane_change_speed = set_speed * 0.95; 
+					double set_speed = 45.0 * Mph2Mps;
+					double lane_change_speed = set_speed * 0.85; 
 					double max_speed = 50.0 * Mph2Mps;     // [m/s] max travel speed 50mph
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
@@ -146,9 +146,12 @@ int main() {
 					}
 
 					if (previous_length >= 2) {
-						double vx = previous_path_x[previous_length - 1] - previous_path_x[previous_length - 2];
-						double vy = previous_path_y[previous_length - 1] - previous_path_y[previous_length - 2];
-						ref_speed = sqrt(vx*vx + vy * vy);
+						double x1 = previous_path_x[previous_length - 1];
+						double x2 = previous_path_x[previous_length - 2];
+						double y1 = previous_path_y[previous_length - 1];
+						double y2 = previous_path_y[previous_length - 2];
+
+						ref_speed = sqrt(((x1-x2)/dT)*((x1 - x2) / dT) + ((y1 - y2) / dT)*((y1 - y2) / dT));
 					}
 
 
