@@ -68,12 +68,13 @@ int main() {
 		  pid.UpdateError(cte);
 		  steer_value = -pid.TotalError();
 
-		  double throttle_value = 0.3;
-		  if (speed > 50.0) {
-			  throttle_value = 0.2;
+		  double throttle_value = 0.15;
+		  if (speed > 30.0) {
+			  throttle_value = 0.1;
 		  }
+
 		  if (angle > 0.3 || angle < -0.3) {
-			  throttle_value = 0.2;
+			  throttle_value = 0.1;
 		  }
 
           // DEBUG
