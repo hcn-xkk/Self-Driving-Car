@@ -112,7 +112,7 @@ int main() {
 					// ref_speed, ref_accel are used to generate new waypoints.
 					// ref_accel can be plus or minus.
 					double ref_speed = std::max(0.0, car_speed * Mph2Mps);
-					double ref_accel = 0.8;
+					double ref_accel = 0.8;   // value for a regular smooth acceleration
 
 
 					// - Find current lane_id:
@@ -153,8 +153,8 @@ int main() {
 						double y2 = previous_path_y[previous_length - 2];
 
 						ref_speed = sqrt(((x1-x2)/dT)*((x1 - x2) / dT) + ((y1 - y2) / dT)*((y1 - y2) / dT));
-						std::cout << "ref_speed " << ref_speed << std::endl;
-						std::cout << "set_speed " << set_speed << std::endl;
+						/*std::cout << "ref_speed " << ref_speed << std::endl;
+						std::cout << "set_speed " << set_speed << std::endl;*/
 
 						//ref_speed = set_speed;
 					}
@@ -163,9 +163,9 @@ int main() {
 					// Set acceleration / deceleration for generating future waypoints.
 					double distance_to_predecesor = check_car_s - car_s;
 					setACCSpeedAndAcceleration(ref_speed, ref_accel, set_speed, distance_to_predecesor, T);
-					std::cout << "ref_speed 2 " << ref_speed << std::endl;
+					/*std::cout << "ref_speed 2 " << ref_speed << std::endl;
 					std::cout << "set_speed 2 " << set_speed << std::endl;
-					std::cout << "ref_accel 2 " << ref_accel << std::endl;
+					std::cout << "ref_accel 2 " << ref_accel << std::endl;*/
 
 					// - Create x and y waypoints:
 					vector<double> new_car_x_waypoints;
@@ -209,7 +209,7 @@ int main() {
 					vector<double> farthest_sd = getFrenet(ref_x, ref_y, ref_yaw, map_waypoints_x, map_waypoints_y);
 					for (int i = 1; i <= 3; i++) {
 						double new_car_s;
-						new_car_s = farthest_sd[0] + dist_inc * ((double)i+0.0);
+						new_car_s = farthest_sd[0] + dist_inc * ((double)i);
 						vector<double> new_car_xy;
 						if (!make_lane_change) {
 							new_car_xy = getXY(new_car_s,
@@ -236,10 +236,10 @@ int main() {
 					spline_xy_car.set_points(new_car_carxy_waypoints[0], new_car_carxy_waypoints[1]);
 					double new_x_car, new_y_car;
 					vector<double> new_xy_global;
-					double delta_x_car = std::max(10.0,ref_speed) * dT ;   // Assuming car_yaw does not change much in one horizon
+					double delta_x_car = std::max(0.0,ref_speed) * dT ;   // Assuming car_yaw does not change much in one horizon
 					auto starting_xy_car = GlobalToCarTransform(ref_x, ref_y, ref_x, ref_y, ref_yaw);
 					double x0_car = starting_xy_car[0];
-					vector<double> help_debug_x, help_debug_y, help_debug_v;
+					//vector<double> help_debug_x, help_debug_y, help_debug_v;
 					for (int i = 1; i <= T / dT - next_x_vals.size(); i++) {
 						// Doing interpolation
 						double theta = atan2(spline_xy_car(x0_car + 0.01) - spline_xy_car(x0_car),
@@ -247,9 +247,9 @@ int main() {
 						new_x_car = delta_x_car*cos(theta) + x0_car;
 						new_y_car = spline_xy_car(new_x_car);
 
-						help_debug_x.push_back(new_x_car);
+					/*	help_debug_x.push_back(new_x_car);
 						help_debug_y.push_back(new_y_car);
-						help_debug_v.push_back(ref_speed);
+						help_debug_v.push_back(ref_speed);*/
 
 
 						// Transform back to global coordinates
@@ -288,10 +288,8 @@ int main() {
 						}
 						delta_x_car = ref_speed * dT;
 						x0_car = new_x_car;
-						
-
 					}
-					if (true) {
+					/*if (true) {
 						std::cout << "Previous length " << previous_length << std::endl;
 						printVector(next_x_vals);
 						printVector(next_y_vals);
@@ -299,7 +297,7 @@ int main() {
 						printVector(help_debug_y);
 						printVector(help_debug_v);
 						
-					}
+					}*/
 
 					msgJson["next_x"] = next_x_vals;
 					msgJson["next_y"] = next_y_vals;
