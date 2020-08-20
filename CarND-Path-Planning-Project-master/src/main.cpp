@@ -124,7 +124,7 @@ int main() {
 
 					// - Find whether there is preceding vehicle, set set_speed, accel/decel:
 					bool lane_is_ocupied = false;
-					double check_car_s = car_s + set_speed * T*2.0;
+					double check_car_s = car_s + set_speed * T;
 					int old_lane_id = lane_id;
 					// Check if segment has other preceding vehicle and update check_car_s, check_speed.
 					lane_is_ocupied = findPredecessorInSegment(lane_id, 
