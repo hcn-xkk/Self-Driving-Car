@@ -281,7 +281,8 @@ bool findPredecessorInSegment(int lane_id, double yellow_line_d, double lane_wid
 bool setTargetLane(int & lane_id, const double set_speed, const double car_s, const double max_speed,
 	const double yellow_line_d, const double lane_width,
 	const double T, const double dT, vector<vector<double>> sensor_fusion) {
-
+	// Called when want to make lane change.
+	// lane_id will be updated if target lane is not the current lane_id.
 	if (lane_id != 0) {
 		// If the planned front region is not occupied in the new lane
 		// want to change to (lane_id-1)
@@ -308,7 +309,6 @@ bool setTargetLane(int & lane_id, const double set_speed, const double car_s, co
 
 void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 	double & set_speed, const double distance_to_predecesor, const double T) {
-
 	// speed_increment should be the speed difference from the timestamp when previous_path is received,
 	// for the speed indexed at previous_length. 
 	// Then the controller needs to do calculation, and send back to the simulator. 
@@ -317,18 +317,18 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 	// This is not going to have huge acceleration.
 	double speed_increment = 0.224; // This is tuned by trying. 
 	double k_accel;
-	if (ref_speed > set_speed + speed_increment) {
+	if (ref_speed > set_speed + speed_increment) { // Speed higher than predecessor.
 		ref_speed -= speed_increment; // using -5m/s^2 accel
 		k_accel = -2.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			set_speed = set_speed * 0.6;  // If predecessor is 
+			set_speed = set_speed * 0.6;  // If distance is close, decrease speed a little. 
 		}
 	}
 	else if (ref_speed < set_speed - speed_increment) {
 		if (distance_to_predecesor < ref_speed * T) {
-			k_accel = +0.0;
+			k_accel = +0.0;   // Speed lower than predecessor, distance quick short, just keep speed. 
 		}
-		else {
+		else {  // Speed lower than predecessor, distance quick long, increase speed.
 			ref_speed += speed_increment; // using -5m/s^2 accel
 			if (ref_speed < 0.5 * set_speed) { // ref_speed very low, need to accelerate fast
 				k_accel = 1.5;
@@ -338,19 +338,18 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 			}
 		}
 	}
-	else {
+	else {   // Speed close to predecessor.
 		ref_speed = set_speed;
 		k_accel = +0.0;
 		if (distance_to_predecesor < ref_speed * T) {
 			k_accel = -2.0; 
 			ref_speed -= speed_increment;
-			set_speed = set_speed * 0.6;  // If predecessor is 
+			set_speed = set_speed * 0.6;  // If distance is close, decrease speed a little. 
 		}
 	}
 	
 	ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
 }
-
 
 
 #endif  // HELPERS_H

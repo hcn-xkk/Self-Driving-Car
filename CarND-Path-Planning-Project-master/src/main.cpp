@@ -153,19 +153,13 @@ int main() {
 						double y2 = previous_path_y[previous_length - 2];
 
 						ref_speed = sqrt(((x1-x2)/dT)*((x1 - x2) / dT) + ((y1 - y2) / dT)*((y1 - y2) / dT));
-						/*std::cout << "ref_speed " << ref_speed << std::endl;
-						std::cout << "set_speed " << set_speed << std::endl;*/
-
-						//ref_speed = set_speed;
 					}
 
 
 					// Set acceleration / deceleration for generating future waypoints.
 					double distance_to_predecesor = check_car_s - car_s;
 					setACCSpeedAndAcceleration(ref_speed, ref_accel, set_speed, distance_to_predecesor, T);
-					/*std::cout << "ref_speed 2 " << ref_speed << std::endl;
-					std::cout << "set_speed 2 " << set_speed << std::endl;
-					std::cout << "ref_accel 2 " << ref_accel << std::endl;*/
+					
 
 					// - Create x and y waypoints:
 					vector<double> new_car_x_waypoints;
@@ -247,11 +241,6 @@ int main() {
 						new_x_car = delta_x_car*cos(theta) + x0_car;
 						new_y_car = spline_xy_car(new_x_car);
 
-					/*	help_debug_x.push_back(new_x_car);
-						help_debug_y.push_back(new_y_car);
-						help_debug_v.push_back(ref_speed);*/
-
-
 						// Transform back to global coordinates
 						new_xy_global = SE2Transform(new_x_car, new_y_car, ref_x, ref_y, ref_yaw);
 						next_x_vals.push_back(new_xy_global[0]);
@@ -259,7 +248,7 @@ int main() {
 						
 						if (fabs(ref_accel) > 1e-3) {
 							if (fabs(ref_speed - set_speed) > fabs(ref_accel * dT)) {
-								ref_speed += ref_accel * dT; //0.224;// ref_accel * dT;
+								ref_speed += ref_accel * dT; 
 							}
 							else {
 								ref_speed = set_speed;
@@ -271,16 +260,7 @@ int main() {
 						delta_x_car = ref_speed * dT;
 						x0_car = new_x_car;
 					}
-					/*if (true) {
-						std::cout << "Previous length " << previous_length << std::endl;
-						printVector(next_x_vals);
-						printVector(next_y_vals);
-						printVector(help_debug_x);
-						printVector(help_debug_y);
-						printVector(help_debug_v);
-						
-					}*/
-
+					
 					msgJson["next_x"] = next_x_vals;
 					msgJson["next_y"] = next_y_vals;
 
