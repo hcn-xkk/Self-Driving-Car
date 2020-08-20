@@ -37,7 +37,7 @@ int main() {
   /**
    * TODO: Initialize the pid variable.
    */
-  pid.Init(0.08, 0.0005, 0.4);
+  pid.Init(0.15, 0.0003, 2.0);
   pid.PrintPIDControl();
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
@@ -68,13 +68,17 @@ int main() {
 		  pid.UpdateError(cte);
 		  steer_value = -pid.TotalError();
 
-		  double throttle_value = 0.15;
+		  double throttle_value = 0.3;
 		  if (speed > 30.0) {
-			  throttle_value = 0.1;
+			  throttle_value = 0.25;
 		  }
 
 		  if (angle > 0.3 || angle < -0.3) {
-			  throttle_value = 0.1;
+			  throttle_value = 0.25;
+		  }
+
+		  if (cte > 1.3 || cte < -1.3) {
+			  throttle_value = 0.15;
 		  }
 
           // DEBUG
