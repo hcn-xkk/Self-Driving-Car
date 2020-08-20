@@ -72,9 +72,13 @@ int main() {
 		  if (speed > 50.0) {
 			  throttle_value = 0.2;
 		  }
+		  if (angle > 0.3) {
+			  throttle_value = 0.2;
+		  }
 
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
+			  << "angle: " << angle
                     << std::endl;
 
           json msgJson;
