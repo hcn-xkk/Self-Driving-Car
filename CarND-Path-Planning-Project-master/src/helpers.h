@@ -319,9 +319,9 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 	double k_accel;
 	if (ref_speed > set_speed + speed_increment) {
 		ref_speed -= speed_increment; // using -5m/s^2 accel
-		k_accel = -1.5;
+		k_accel = -2.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			set_speed = set_speed * 0.9;  // If predecessor is 
+			set_speed = set_speed * 0.8;  // If predecessor is 
 		}
 	}
 	else if (ref_speed < set_speed - speed_increment) {
@@ -337,7 +337,7 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		ref_speed = set_speed;
 		k_accel = +0.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			k_accel = -1.5; 
+			k_accel = -2.0; 
 		}
 	}
 	
