@@ -296,7 +296,7 @@ bool setTargetLane(int & lane_id, const double set_speed, const double car_s, co
 	else {
 		bool right_lane_is_ocupied = checkVehicleInSegment(lane_id + 1,
 			yellow_line_d, lane_width, dT, car_s - max_speed * T,
-			car_s + max_speed * T, sensor_fusion);
+			car_s + max_speed * T * 1.5, sensor_fusion);
 		if (!right_lane_is_ocupied) {
 			lane_id += 1;
 			return true;
