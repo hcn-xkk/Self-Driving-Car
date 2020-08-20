@@ -37,7 +37,7 @@ int main() {
   /**
    * TODO: Initialize the pid variable.
    */
-  pid.Init(0.2, 0.004, 3.0);
+  pid.Init(0.1, 0.0, 0.2);
   pid.PrintPIDControl();
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
@@ -66,7 +66,7 @@ int main() {
            *   Maybe use another PID controller to control the speed!
            */
 		  pid.UpdateError(cte);
-		  steer_value -= pid.TotalError();
+		  steer_value = -pid.TotalError();
 
 		  double throttle_value = 0.3;
 		  if (speed > 50.0) {
