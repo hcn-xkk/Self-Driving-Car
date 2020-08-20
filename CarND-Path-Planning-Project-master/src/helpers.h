@@ -315,7 +315,7 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 	// This approximately takes 8~10 steps. 
 	// With 2~3m/s^2 acceleration, speed_increment is set to 0.224.
 	// This is not going to have huge acceleration.
-	double speed_increment = 0.224; // This is tuned by trying. 
+	double speed_increment = ref_accel * 0.02 * 2;// Use 2*ref_accel to have rapid response.  
 	double k_accel;
 	if (ref_speed > set_speed + speed_increment) { // Speed higher than predecessor.
 		ref_speed -= speed_increment; // using -5m/s^2 accel
