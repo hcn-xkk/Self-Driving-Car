@@ -338,6 +338,8 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		k_accel = +0.0;
 		if (distance_to_predecesor < ref_speed * T) {
 			k_accel = -2.0; 
+			ref_speed -= speed_increment;
+			set_speed = set_speed * 0.8;  // If predecessor is 
 		}
 	}
 	
