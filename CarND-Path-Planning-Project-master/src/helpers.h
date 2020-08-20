@@ -321,16 +321,21 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		ref_speed -= speed_increment; // using -5m/s^2 accel
 		k_accel = -2.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			set_speed = set_speed * 0.8;  // If predecessor is 
+			set_speed = set_speed * 0.6;  // If predecessor is 
 		}
 	}
 	else if (ref_speed < set_speed - speed_increment) {
-		ref_speed += speed_increment; // using -5m/s^2 accel
-		if (ref_speed < 0.5 * set_speed) { // ref_speed very low, need to accelerate fast
-			k_accel = 1.5;
+		if (distance_to_predecesor < ref_speed * T) {
+			k_accel = +0.0;
 		}
 		else {
-			k_accel = 1.0;
+			ref_speed += speed_increment; // using -5m/s^2 accel
+			if (ref_speed < 0.5 * set_speed) { // ref_speed very low, need to accelerate fast
+				k_accel = 1.5;
+			}
+			else {
+				k_accel = 1.0;
+			}
 		}
 	}
 	else {
@@ -339,7 +344,7 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		if (distance_to_predecesor < ref_speed * T) {
 			k_accel = -2.0; 
 			ref_speed -= speed_increment;
-			set_speed = set_speed * 0.8;  // If predecessor is 
+			set_speed = set_speed * 0.6;  // If predecessor is 
 		}
 	}
 	
