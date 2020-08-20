@@ -66,7 +66,7 @@ int main() {
            *   Maybe use another PID controller to control the speed!
            */
 		  pid.UpdateError(cte);
-		  cte -= pid.TotalError();
+		  steer_value -= pid.TotalError();
 
 		  double throttle_value = 0.3;
 		  if (speed > 50.0) {
