@@ -72,7 +72,7 @@ int main() {
 		  if (speed > 50.0) {
 			  throttle_value = 0.2;
 		  }
-		  if (angle > 0.3) {
+		  if (angle > 0.3 || angle < -0.3) {
 			  throttle_value = 0.2;
 		  }
 
