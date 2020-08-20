@@ -333,14 +333,19 @@ bool setTargetLane(int & lane_id, const double set_speed, const double car_s, co
 void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 	double & set_speed, const double distance_to_predecesor, const double T) {
 
-	double speed_increment = 0.224; // ref_accel * (1.0*T);
+	// speed_increment should be the speed difference from the timestamp when previous_path is received,
+	// for the speed indexed at previous_length. 
+	// Then the controller needs to do calculation, and send back to the simulator. 
+	// This approximately takes 8~10 steps. 
+	// With 2~3m/s^2 acceleration, speed_increment is set to 0.224.
+	// This is not going to have huge acceleration.
+	double speed_increment = 0.224; // This is tuned by trying. 
 	double k_accel;
 	if (ref_speed > set_speed + speed_increment) {
 		ref_speed -= speed_increment; // using -5m/s^2 accel
 		k_accel = -1.5;
 		if (distance_to_predecesor < ref_speed * T) {
-			set_speed = set_speed * 0.9;
-			// k_accel -= 1.2* (1.2 - (distance_to_predecesor) / (ref_speed * T));
+			set_speed = set_speed * 0.9;  // If predecessor is 
 		}
 	}
 	else if (ref_speed < set_speed - speed_increment) {
@@ -356,10 +361,10 @@ void setACCSpeedAndAcceleration(double & ref_speed, double & ref_accel,
 		ref_speed = set_speed;
 		k_accel = +0.0;
 		if (distance_to_predecesor < ref_speed * T) {
-			k_accel = -1.5; // 1.2 * (1.2 - std::max(1.0, distance_to_predecesor / (ref_speed * T)));
+			k_accel = -1.5; 
 		}
 	}
-	std::cout << "k_accel " << k_accel << std::endl;
+	/*std::cout << "k_accel " << k_accel << std::endl;*/
 
 	ref_accel *= k_accel;   // update ref_accel for generating future waypoints.
 }
