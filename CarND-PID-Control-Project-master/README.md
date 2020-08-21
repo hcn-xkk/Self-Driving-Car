@@ -37,6 +37,15 @@ Fellow students have put together a guide to Windows set-up for the project [her
 
 Tips for setting up your environment can be found [here](https://classroom.udacity.com/nanodegrees/nd013/parts/40f38239-66b6-46ec-ae68-03afd8a601c8/modules/0949fca6-b379-42af-a919-ee50aa304e6a/lessons/f758c44c-5e40-4e01-93b5-1a82aa4e044f/concepts/23d376c7-0195-4276-bdf0-e02f1f3c665d)
 
+## Implementation Details
+
+PID controller is implemented as a class called `PID`. The membership function `UpdateError` calculates the errors for propotional, integral and derivative terms. The membership function `TotalError` calculates the total error term, which will be used to calculate steering at the next time step.
+
+Gains for the PID controller are hand-tuned. Here is the process I followed:
+- I started from a single P term. It should be able to steer the car back to center lane, but will have oscillations. 
+- Then the D term is added. With a PD controller, the car almost does not have any overshoot and has much less oscillations. D controller should add stability, and indeed I saw the car can mostly stable at the center lane with minor tracking error. 
+- Finally the integral term is added with a very small integral gain. With this term added, when the vehicle steering stables, it can stay at the lane center without error.  
+
 ## Editor Settings
 
 We've purposefully kept editor configuration files out of this repo in order to
