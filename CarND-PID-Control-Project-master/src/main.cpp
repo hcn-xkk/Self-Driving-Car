@@ -70,15 +70,15 @@ int main() {
 		  pid.UpdateError(cte);
 		  steer_value = -pid.TotalError();
 
-		  double target_speed = 30.0;
+		  double target_speed = 50.0;
 		  if (angle > 0.3 || angle < -0.3) {
-			  target_speed = 25.0;
+			  target_speed = 35.0;
 		  }
-		  if (cte > 1.3 || cte < -1.3) {
-			  target_speed = 15.0;
+		  if (cte > 1.7 || cte < -1.7) {
+			  target_speed = 35.0;
 		  }
 		  pid_speed.UpdateError(speed - target_speed);
-		  double throttle_value = 0.3 - pid_speed.TotalError();
+		  double throttle_value = 0.4 - pid_speed.TotalError();
 		  
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
