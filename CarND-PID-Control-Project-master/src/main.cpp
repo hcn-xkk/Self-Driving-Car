@@ -39,6 +39,8 @@ int main() {
    */
   pid.Init(0.15, 0.0003, 2.0);
   pid.PrintPIDControl();
+  PID pid_speed;
+  pid_speed.Init(0.15, 0.0, 0.1);
 
   h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
                      uWS::OpCode opCode) {
@@ -68,19 +70,16 @@ int main() {
 		  pid.UpdateError(cte);
 		  steer_value = -pid.TotalError();
 
-		  double throttle_value = 0.3;
-		  if (speed > 30.0) {
-			  throttle_value = 0.25;
-		  }
-
+		  double target_speed = 30.0;
 		  if (angle > 0.3 || angle < -0.3) {
-			  throttle_value = 0.25;
+			  target_speed = 25.0;
 		  }
-
 		  if (cte > 1.3 || cte < -1.3) {
-			  throttle_value = 0.15;
+			  target_speed = 15.0;
 		  }
-
+		  pid_speed.UpdateError(speed - target_speed);
+		  throttle_value = 0.3 - pid_speed.TotalError();
+		  
           // DEBUG
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
 			  << "angle: " << angle
