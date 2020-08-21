@@ -27,7 +27,7 @@ void PID::UpdateError(double cte) {
 	p_error_ = cte;
 	i_error_ += cte;
 	d_error_ = cte - last_cte_;
-	// Update the last cte:
+	// Update the last state:
 	last_cte_ = cte;
 }
 

@@ -38,7 +38,7 @@ int main() {
 	 * TODO: Initialize the pid variable.
 	 */
 	pid.Init(0.15, 0.0003, 2.8);
-	pid.PrintPIDControl();
+	// pid.PrintPIDControl();
 
 	h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
 		uWS::OpCode opCode) {
@@ -65,26 +65,27 @@ int main() {
 					 * NOTE: Feel free to play around with the throttle and speed.
 					 *   Maybe use another PID controller to control the speed!
 					 */
+					// Steering control through PID.
 					pid.UpdateError(cte);
 					steer_value = -pid.TotalError();
 
+					// An emperical speed controller.
 					double throttle_value = 0.3;
 					if (speed > 30.0) {
 						throttle_value = 0.25;
 					}
-
+					// If lateral is challenging, slow down.
 					if (angle > 0.3 || angle < -0.3) {
 						throttle_value = 0.25;
 					}
-
 					if (cte > 1.3 || cte < -1.3) {
 						throttle_value = 0.15;
 					}
 
 					// DEBUG
-					std::cout << "CTE: " << cte << " Steering Value: " << steer_value
+					/*std::cout << "CTE: " << cte << " Steering Value: " << steer_value
 						<< "angle: " << angle
-						<< std::endl;
+						<< std::endl;*/
 
 					json msgJson;
 					msgJson["steering_angle"] = steer_value;

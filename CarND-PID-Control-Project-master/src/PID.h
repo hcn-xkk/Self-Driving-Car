@@ -42,7 +42,7 @@ private:
 	double p_error_;
 	double i_error_;
 	double d_error_;
-	double last_cte_;
+	double last_cte_;  // Remember the last state value.
 
 	/**
 	 * PID Coefficients
