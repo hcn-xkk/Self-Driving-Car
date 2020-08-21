@@ -81,6 +81,8 @@ int main() {
 		  double throttle_value = 0.4 - pid_speed.TotalError();
 		  
           // DEBUG
+		  steer_value = 0.0;
+		  throttle_value = 0.4;
           std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
 			  << "angle: " << angle
                     << std::endl;
