@@ -18,107 +18,109 @@ double rad2deg(double x) { return x * 180 / pi(); }
 // If there is data the JSON object in string format will be returned,
 // else the empty string "" will be returned.
 string hasData(string s) {
-  auto found_null = s.find("null");
-  auto b1 = s.find_first_of("[");
-  auto b2 = s.find_last_of("]");
-  if (found_null != string::npos) {
-    return "";
-  }
-  else if (b1 != string::npos && b2 != string::npos) {
-    return s.substr(b1, b2 - b1 + 1);
-  }
-  return "";
+	auto found_null = s.find("null");
+	auto b1 = s.find_first_of("[");
+	auto b2 = s.find_last_of("]");
+	if (found_null != string::npos) {
+		return "";
+	}
+	else if (b1 != string::npos && b2 != string::npos) {
+		return s.substr(b1, b2 - b1 + 1);
+	}
+	return "";
 }
 
 int main() {
-  uWS::Hub h;
+	uWS::Hub h;
 
-  PID pid;
-  /**
-   * TODO: Initialize the pid variable.
-   */
-  pid.Init(0.15, 0.0003, 4.0);
-  pid.PrintPIDControl();
-  PID pid_speed;
-  pid_speed.Init(0.15, 0.0, 0.1);
+	PID pid;
+	/**
+	 * TODO: Initialize the pid variable.
+	 */
+	pid.Init(0.15, 0.0003, 2.8);
+	pid.PrintPIDControl();
 
-  h.onMessage([&pid, &pid_speed](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length, 
-                     uWS::OpCode opCode) {
-    // "42" at the start of the message means there's a websocket message event.
-    // The 4 signifies a websocket message
-    // The 2 signifies a websocket event
-    if (length && length > 2 && data[0] == '4' && data[1] == '2') {
-      auto s = hasData(string(data).substr(0, length));
+	h.onMessage([&pid](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+		uWS::OpCode opCode) {
+		// "42" at the start of the message means there's a websocket message event.
+		// The 4 signifies a websocket message
+		// The 2 signifies a websocket event
+		if (length && length > 2 && data[0] == '4' && data[1] == '2') {
+			auto s = hasData(string(data).substr(0, length));
 
-      if (s != "") {
-        auto j = json::parse(s);
+			if (s != "") {
+				auto j = json::parse(s);
 
-        string event = j[0].get<string>();
+				string event = j[0].get<string>();
 
-        if (event == "telemetry") {
-          // j[1] is the data JSON object
-          double cte = std::stod(j[1]["cte"].get<string>());
-          double speed = std::stod(j[1]["speed"].get<string>());
-          double angle = std::stod(j[1]["steering_angle"].get<string>());
-          double steer_value;
-          /**
-           * TODO: Calculate steering value here, remember the steering value is
-           *   [-1, 1].
-           * NOTE: Feel free to play around with the throttle and speed.
-           *   Maybe use another PID controller to control the speed!
-           */
-		  pid.UpdateError(cte);
-		  steer_value = -pid.TotalError();
+				if (event == "telemetry") {
+					// j[1] is the data JSON object
+					double cte = std::stod(j[1]["cte"].get<string>());
+					double speed = std::stod(j[1]["speed"].get<string>());
+					double angle = std::stod(j[1]["steering_angle"].get<string>());
+					double steer_value;
+					/**
+					 * TODO: Calculate steering value here, remember the steering value is
+					 *   [-1, 1].
+					 * NOTE: Feel free to play around with the throttle and speed.
+					 *   Maybe use another PID controller to control the speed!
+					 */
+					pid.UpdateError(cte);
+					steer_value = -pid.TotalError();
 
-		  double target_speed = 40.0;
-		  if (angle > 0.3 || angle < -0.3) {
-			  target_speed = 35.0;
-		  }
-		  if (cte > 1.7 || cte < -1.7) {
-			  target_speed = 35.0;
-		  }
-		  pid_speed.UpdateError(speed - target_speed);
-		  double throttle_value = 0.4 - pid_speed.TotalError();
-		  
-          // DEBUG
-		  
-          std::cout << "CTE: " << cte << " Steering Value: " << steer_value 
-			  << "angle: " << angle
-                    << std::endl;
+					double throttle_value = 0.3;
+					if (speed > 30.0) {
+						throttle_value = 0.25;
+					}
 
-          json msgJson;
-          msgJson["steering_angle"] = steer_value;
-          msgJson["throttle"] = throttle_value;
+					if (angle > 0.3 || angle < -0.3) {
+						throttle_value = 0.25;
+					}
 
-          auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msg << std::endl;
-          ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-        }  // end "telemetry" if
-      } else {
-        // Manual driving
-        string msg = "42[\"manual\",{}]";
-        ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
-      }
-    }  // end websocket message if
-  }); // end h.onMessage
+					if (cte > 1.3 || cte < -1.3) {
+						throttle_value = 0.15;
+					}
 
-  h.onConnection([&h](uWS::WebSocket<uWS::SERVER> ws, uWS::HttpRequest req) {
-    std::cout << "Connected!!!" << std::endl;
-  });
+					// DEBUG
+					std::cout << "CTE: " << cte << " Steering Value: " << steer_value
+						<< "angle: " << angle
+						<< std::endl;
 
-  h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code, 
-                         char *message, size_t length) {
-    ws.close();
-    std::cout << "Disconnected" << std::endl;
-  });
+					json msgJson;
+					msgJson["steering_angle"] = steer_value;
+					msgJson["throttle"] = throttle_value;
 
-  int port = 4567;
-  if (h.listen(port)) {
-    std::cout << "Listening to port " << port << std::endl;
-  } else {
-    std::cerr << "Failed to listen to port" << std::endl;
-    return -1;
-  }
-  
-  h.run();
+					auto msg = "42[\"steer\"," + msgJson.dump() + "]";
+					std::cout << msg << std::endl;
+					ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+				}  // end "telemetry" if
+			}
+			else {
+				// Manual driving
+				string msg = "42[\"manual\",{}]";
+				ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
+			}
+		}  // end websocket message if
+	}); // end h.onMessage
+
+	h.onConnection([&h](uWS::WebSocket<uWS::SERVER> ws, uWS::HttpRequest req) {
+		std::cout << "Connected!!!" << std::endl;
+	});
+
+	h.onDisconnection([&h](uWS::WebSocket<uWS::SERVER> ws, int code,
+		char *message, size_t length) {
+		ws.close();
+		std::cout << "Disconnected" << std::endl;
+	});
+
+	int port = 4567;
+	if (h.listen(port)) {
+		std::cout << "Listening to port " << port << std::endl;
+	}
+	else {
+		std::cerr << "Failed to listen to port" << std::endl;
+		return -1;
+	}
+
+	h.run();
 }
