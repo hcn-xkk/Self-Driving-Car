@@ -37,7 +37,7 @@ int main() {
   /**
    * TODO: Initialize the pid variable.
    */
-  pid.Init(0.15, 0.0003, 2.0);
+  pid.Init(0.15, 0.0003, 2.8);
   pid.PrintPIDControl();
   PID pid_speed;
   pid_speed.Init(0.15, 0.0, 0.1);
@@ -70,7 +70,7 @@ int main() {
 		  pid.UpdateError(cte);
 		  steer_value = -pid.TotalError();
 
-		  double target_speed = 50.0;
+		  double target_speed = 40.0;
 		  if (angle > 0.3 || angle < -0.3) {
 			  target_speed = 35.0;
 		  }
