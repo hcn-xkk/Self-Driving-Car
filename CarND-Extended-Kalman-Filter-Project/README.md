@@ -224,3 +224,5 @@ The estimation result on Dataset 1 & 2 are shown in the following images:
 ![Result_Dataset2][image3]
 
 As shown, the RMSE values for positions and speeds satisfy the project requirement.
+
+[Here](https://drive.google.com/drive/folders/1PXqtLRl7LurzXZ9UgfaIvFw8zrQ6rfvp?usp=sharing) are two recorded videos showing the performance of the implemented extended kalman filter. 
