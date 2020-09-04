@@ -137,3 +137,5 @@ This model is tested in the simulator and drives the car pretty well.
 #### 4. Testing in simulator and record video
 
 * run.mp4 is the video recording of the vehicle driving autonomously at least one lap around the track. The vehicle is driven mostly smoothly, but there is one part in the trial where the vehicle gets away from the lane center, but it could recover from edges of the lane. 
+
+* A recorded video can be seen [here](https://drive.google.com/file/d/1MYc8lJXZ0nD7jEdATznZug1DY6IGrGrz/view?usp=sharing).
