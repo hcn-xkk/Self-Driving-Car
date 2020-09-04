@@ -1,3 +1,7 @@
+
+[image1]: ./images/Port_Forwarding.png "Port_Forwarding"
+
+
 # Overview
 This repository contains all the code needed to complete the final project for the Localization course in Udacity's Self-Driving Car Nanodegree.
 
@@ -8,6 +12,36 @@ All you will need to submit is your `src` directory. You should probably do a `g
 Your robot has been kidnapped and transported to a new location! Luckily it has a map of this location, a (noisy) GPS estimate of its initial location, and lots of (noisy) sensor and control data.
 
 In this project you will implement a 2 dimensional particle filter in C++. Your particle filter will be given a map and some initial localization information (analogous to what a GPS would provide). At each time step your filter will also get observation and control data.
+
+
+
+## Instructions For Setting Up Environment
+This repository includes two files that can be used to set up and install [uWebSocketIO](https://github.com/uWebSockets/uWebSockets) for either Linux or Mac systems. For windows you can use either Docker, VMware, or even [Windows 10 Bash on Ubuntu](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) to install uWebSocketIO. Please see the uWebSocketIO Starter Guide page in the classroom within the EKF Project lesson for the required version and installation scripts. For use in Windows10, below is an instruction for setting up the environment. 
+
+### uWebSocketIO Instructions using docker in Windows10
+
+1. Launch "Docker quickstart terminal"
+2. Enter a Docker image that has all the project dependencies by running:
+
+`docker run -it -p 4567:4567 -v 'pwd':/work udacity/controls_kit:latest`
+
+After running this command, we should see a command prompt that looks like:
+`root@eb84269b7603:/work#`
+
+3. To exit the docker image, run `exit` after test is done. 
+
+### Port Forwarding Instructions
+
+When using a virtual machine and running the simulator on the host machine, it is critical to set up port forwarding, as described in the following steps.
+
+1. Launch Oracle VM Virtualbox
+2. Click on the default session and select settings.
+3. Click on Network, and then Advanced.
+4. Click on Port Forwarding
+5. Click on the green plus, adds new port forwarding rule.
+6. Add a rule that assigns 4567 as both the host port and guest Port, as in the follwing image.
+![alt text][image1]
+
 
 ## Running the Code
 This project involves the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases)
@@ -87,6 +121,11 @@ Your job is to build out the methods in `particle_filter.cpp` until the simulato
 ```
 Success! Your particle filter passed!
 ```
+
+## Video Demonstration
+
+[This link](https://drive.google.com/file/d/1B7bPQgvl1Cymo6WFumZwcnqUyzYaY2Bq/view?usp=sharing) contains the recorded videos for the particle filter when run on the Term 2 simulator [here](https://github.com/udacity/self-driving-car-sim). 
+
 
 # Implementing the Particle Filter
 The directory structure of this repository is as follows:
